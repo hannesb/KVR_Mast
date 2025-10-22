@@ -1,0 +1,28 @@
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/Steuerung' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+PROGRAM PoweredByGenerator
+VAR_INPUT
+	init: BOOL;
+END_VAR
+VAR
+	rtTaste: R_TRIG;
+	tofTaste: TOF;
+END_VAR
+(* @END_DECLARATION := '0' *)
+IF init THEN
+	(* Nach dem Einschalten erst mal aktivieren *)
+	outputs.SchuetzGrundlast := TRUE;
+END_IF
+
+(* Taste entprellen *)
+tofTaste(IN := inputs.TastePoweredByGenerator, PT := T#200ms);
+rtTaste(CLK := tofTaste.Q);
+IF rtTaste.Q THEN
+	(* toggle *)
+	outputs.SchuetzGrundlast := NOT outputs.SchuetzGrundlast;
+END_IF
+
+END_PROGRAM

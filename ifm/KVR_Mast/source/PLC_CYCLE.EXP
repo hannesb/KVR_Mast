@@ -1,0 +1,53 @@
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+PROGRAM PLC_CYCLE
+VAR_INPUT
+	reset_max_cycletime: BOOL;
+	init: BOOL;
+END_VAR
+VAR_OUTPUT
+	cycletime_us: DWORD;
+	max_cycle_us: DWORD;
+END_VAR
+VAR
+	old_cycle: DWORD;
+	TIMER_READ_US1: TIMER_READ_US;
+	cycle: DWORD;
+	nextTS: DWORD;
+END_VAR
+
+(* @END_DECLARATION := '0' *)
+TIMER_READ_US1(TIME_US=>cycle );
+cycletime_us:=cycle-old_cycle;
+old_cycle:=cycle;
+
+IF max_cycle_us<cycletime_us AND NOT init THEN
+	max_cycle_us:=cycletime_us;
+END_IF
+
+IF reset_max_cycletime THEN
+	max_cycle_us:=0;
+END_IF
+
+IF init THEN
+	nextTS := cycle;
+END_IF
+(* Mehr als 1 Mio Ticks vergangen? *)
+(* Zweikomplementarithmetik, d.h. funktioniert auch bei DWORD-Überlauf *)
+IF cycle - nextTS > 1000000 THEN
+	(* Das nächste Mal wieder nach 1 Mio Ticks (=1 Sekunde) *)
+	nextTS := nextTS + 1000000;
+	IF FU1_QSCmd <> QSCMD_HALT THEN
+		Mast1MotorActiveTimeSeconds := Mast1MotorActiveTimeSeconds + 1;
+	END_IF
+END_IF
+IF FlagsPC2ECU.PC2ECU_ResetMotorActiveTime THEN
+	Mast1MotorActiveTimeSeconds := 0;
+END_IF
+
+
+
+END_PROGRAM

@@ -1,0 +1,58 @@
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @GLOBAL_VARIABLE_LIST := 'Global_Variables' *)
+(* @PATH := '' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+VAR_GLOBAL
+
+	BlinkSlow: BOOL;
+
+	MasterPresent: BOOL;
+
+	inputs: TYPE_INPUTS;
+	outputs: TYPE_OUTPUTS;
+
+	canNodeFU1Present: BOOL;
+
+	tasteAuf: BOOL;
+	tasteAb: BOOL;
+
+	FlagsECU2PC: WORD			{parameter list=proc_vars_ecu [name=FlagsECU2PC 					index=16#3000 subindex=1 accessright="read only"] };
+	FlagsPC2ECU: WORD			{parameter list=proc_vars_ecu [name=FlagsPC2ECU 					index=16#3000 subindex=2 accessright="write only"] };
+	Windspeed: BYTE				{parameter list=proc_vars_ecu [name=Windspeed	 					index=16#3000 subindex=3 accessright="read only"] };
+	CabinetTemperature: SINT	{parameter list=proc_vars_ecu [name=Temperature	 					index=16#3000 subindex=4 accessright="read only"] };
+	ExtTemperature: SINT		{parameter list=proc_vars_ecu [name=ExtTemperature	 				index=16#3000 subindex=5 accessright="read only"] };
+	IntVoltage: WORD			{parameter list=proc_vars_ecu [name=IntVoltage		 				index=16#3000 subindex=6 accessright="read only"] };
+
+	Mast1Height: WORD			{parameter list=proc_vars_mast1 [name=Mast1Height 					index=16#3001 subindex=1 accessright="read only"] };
+	Mast1FlagsECU2PC: WORD		{parameter list=proc_vars_mast1 [name=Mast1FlagsECU2PC 				index=16#3003 subindex=1 accessright="read only"] };
+	Mast1FlagsPC2ECU: WORD		{parameter list=proc_vars_mast1 [name=Mast1FlagsPC2ECU 				index=16#3004 subindex=1 accessright="write only"] };
+	Mast1Current: DINT			{parameter list=proc_vars_mast1 [name=Mast1Current 					index=16#3006 subindex=1 accessright="read only"] };
+	Mast1ErrorECU2PC: WORD		{parameter list=proc_vars_mast1 [name=Mast1ErrorECU2PC				index=16#300D subindex=1 accessright="read only"] };
+	Mast1FUErrorCode: WORD		{parameter list=proc_vars_mast1 [name=Mast1FUErrorCode				index=16#3010 subindex=1 accessright="read only"] };
+	Mast1Speed: DINT			{parameter list=proc_vars_mast1 [name=Mast1Speed					index=16#3013 subindex=1 accessright="read only"] };
+
+	(*
+	Mast1TempPcbPower: WORD		{parameter list=proc_vars_mast1 [name=Mast1TempPcbPower				index=16#300A subindex=1 accessright="read only"] };
+	Mast1TempPcbController: WORD{parameter list=proc_vars_mast1 [name=Mast1TempPcbController		index=16#300B subindex=1 accessright="read only"] };
+	Mast1TempPcbAmplifier: WORD	{parameter list=proc_vars_mast1 [name=Mast1TempPcbAmplifier			index=16#300F subindex=1 accessright="read only"] };
+	*)
+
+	Mast1SetEncoderPW: DWORD	{parameter list=Parameters 		[name=Mast1SetEncoderPW				index=16#2014 subindex=1 accessright="read-write"] };
+
+	Version: BYTE				{parameter list=version_info 	[name=Version						index=16#3020 subindex=1 accessright="read only"] };
+	VersionDate: DWORD			{parameter list=version_info 	[name=VersionDate					index=16#3020 subindex=2 accessright="read only"] };
+
+	Mast1MotorActiveTimeSeconds2: DWORD {parameter list=proc_vars_mast1 [name=Mast1MotorActiveTimeSeconds2 index=16#3014 subindex=1 accessright="read only"] };
+
+	FU1_Current_Sim: DINT;
+
+END_VAR
+
+(* @OBJECT_END := 'Global_Variables' *)
+(* @CONNECTIONS := Global_Variables
+FILENAME : ''
+FILETIME : 0
+EXPORT : 0
+NUMOFCONNECTIONS : 0
+*)

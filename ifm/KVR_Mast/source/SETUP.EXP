@@ -1,0 +1,25 @@
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/Steuerung' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+PROGRAM SETUP
+VAR_INPUT
+	Init: BOOL;
+END_VAR
+VAR
+	getAppInfo: GET_APP_INFO;
+END_VAR
+(* @END_DECLARATION := '0' *)
+IF NOT Init THEN
+	RETURN;
+END_IF;
+
+Mast1FlagsECU2PC.ECU2PC_ParkPosition := FALSE;
+
+getAppInfo(ENABLE := TRUE);
+
+VersionDate := STRING_TO_DWORD(LEFT(getAppInfo.BUILD_DATE, 8));
+Version := STRING_TO_BYTE(LEFT(getAppInfo.VERSION, 3));
+
+END_PROGRAM

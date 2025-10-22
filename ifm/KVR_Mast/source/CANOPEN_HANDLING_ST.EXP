@@ -1,0 +1,97 @@
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/CANopen' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK CANopen_HANDLING_ST
+(* CANopen Master and heartbeat handling *)
+VAR
+	CANOPEN_GETSTATE_: CANOPEN_GETSTATE;
+	Execute_Getstate: BOOL := TRUE;
+	CANOPEN_GETGUARDHBERRLIST_: CANOPEN_GETGUARDHBERRLIST;
+	Execute_Guardlst: BOOL := TRUE;
+	ResetErrorList: BOOL;
+	PlcNodeId: BYTE;
+	i: INT;
+	GuardErrorCnt: WORD;
+END_VAR
+VAR_INPUT
+	Ch: BYTE;
+	NodeId: BYTE;
+END_VAR
+VAR_OUTPUT
+	BaudRate: DWORD;
+	MasterState: BYTE;
+	Guard_Error: BOOL;
+	NodeIdList: ARRAY[0..MAXGUARDERR] OF BYTE;
+	Canstate: BYTE;
+	NodeStade: BYTE;
+	LastNodeState: BYTE;
+END_VAR
+
+
+(* @END_DECLARATION := '0' *)
+
+(* ^^^^ Get the current state of the CANopen master ^^^^ *)
+CANOPEN_GETSTATE_(
+	EXECUTE:=Execute_Getstate ,
+	CHANNEL:=Ch ,
+	NODE:=NodeId ,
+	MASTERSTATE=>MasterState ,
+	PLCNODEID=>PlcNodeId ,
+	PLCBAUDRATE=>BaudRate ,
+	PLCVERSION=>,
+	CANSTATE=>Canstate ,
+	NODESTATE=>NodeStade ,
+	LASTNODESTATE=>LastNodeState ,
+	RESULT=> );
+
+(* Values are valid now, function call can be stopped *)
+IF CANOPEN_GETSTATE_.RESULT= 1 THEN
+	Execute_Getstate:=FALSE;
+END_IF
+
+(* Function is passive, execute again *)
+IF CANOPEN_GETSTATE_.RESULT= 0 THEN
+	Execute_Getstate:=TRUE;
+END_IF
+
+(* ^^^^^ Get heartbeaterror or nodeguarding error ^^^^ *)
+CANOPEN_GETGUARDHBERRLIST_(
+	EXECUTE:=Execute_Guardlst ,
+	CHANNEL:=Ch ,
+	ResetList:=ResetErrorList ,
+	N_NODES=>GuardErrorCnt,
+	NODEID=>NodeIdList ,
+	RESULT=> );
+
+(* Values are valid now, function call can be stopped *)
+IF CANOPEN_GETGUARDHBERRLIST_.RESULT= 1 THEN
+	Execute_Guardlst:= FALSE;
+END_IF
+
+(* Function is passive, execute again *)
+IF CANOPEN_GETGUARDHBERRLIST_.RESULT= 0 THEN
+	Execute_Guardlst:= TRUE;
+END_IF
+
+(* An heartbeaterror has been appeared *)
+IF CANOPEN_GETGUARDHBERRLIST_.N_NODES >0 THEN
+	Guard_Error:=TRUE;
+ELSE
+	Guard_Error:=FALSE;
+END_IF;
+
+IF Ch = CAN_CHANNEL_LOCAL THEN
+
+	canNodeFU1Present := TRUE;
+	
+	FOR i := 0 TO GuardErrorCnt DO
+		IF FU1_NODE_ID = NodeIdList[i] THEN
+			canNodeFU1Present := FALSE;
+		END_IF
+	END_FOR
+
+END_IF
+
+END_FUNCTION_BLOCK

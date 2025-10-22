@@ -1,0 +1,43 @@
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/CANopen' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+FUNCTION_BLOCK CANopen_GetStateSlave
+VAR
+	CANOPEN_GETSTATE_: CANOPEN_GETSTATE;
+	Execute_Getstate: BOOL := TRUE;
+END_VAR
+VAR_INPUT
+	Ch: BYTE;
+	NodeId: BYTE;
+END_VAR
+VAR_OUTPUT
+	Canstate: BYTE;
+	NodeState: BYTE;
+	LastNodeState: BYTE;
+END_VAR
+(* @END_DECLARATION := '0' *)
+CANOPEN_GETSTATE_(
+	EXECUTE:=Execute_Getstate ,
+	CHANNEL:=Ch ,
+	NODE:=NodeId ,
+	MASTERSTATE=>,
+	PLCNODEID=> ,
+	PLCBAUDRATE=> ,
+	PLCVERSION=>,
+	CANSTATE=>Canstate ,
+	NODESTATE=>NodeState ,
+	LASTNODESTATE=>LastNodeState ,
+	RESULT=> );
+
+(* Values are valid now, function call can be stopped *)
+IF CANOPEN_GETSTATE_.RESULT= 1 THEN
+	Execute_Getstate:=FALSE;
+END_IF
+
+(* Function is passive, execute again *)
+IF CANOPEN_GETSTATE_.RESULT= 0 THEN
+	Execute_Getstate:=TRUE;
+END_IF
+END_FUNCTION_BLOCK

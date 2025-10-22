@@ -1,0 +1,81 @@
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @GLOBAL_VARIABLE_LIST := 'Global_Constants' *)
+(* @PATH := '' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+VAR_GLOBAL CONSTANT
+
+	MAX_CTRLINDEX: BYTE := 0;
+
+	SIMULATIONSMODUS: BOOL := TRUE;
+
+	(* Flag positions for variable FlagsECU2PC *)
+	ECU2PC_AllowRemote: INT := 3;
+	ECU2PC_EmergencyStop: INT := 4;
+	ECU2PC_RemoteAckn: INT := 6;
+	ECU2PC_MainSwitch: INT := 7;
+
+	(* Flag positions for variable FlagsPC2ECU *)
+	PC2ECU_Remote: INT := 0;
+	PC2ECU_BlackOut: INT := 1;
+	PC2ECU_ResetMotorActiveTime: INT := 3;
+
+	(* Flag positions for variables Mast[x].FlagsECU2PC *)
+	ECU2PC_TopPosition: INT := 0;
+	ECU2PC_BottomPosition: INT := 1;
+	ECU2PC_MovingUp: INT := 2;
+	ECU2PC_MovingDown: INT := 3;
+	ECU2PC_LocalUp: INT := 4;
+	ECU2PC_LocalDown: INT := 5;
+	ECU2PC_LimitSwitch4m: INT := 7;
+	ECU2PC_LimitSwitchBottom: INT := 8;
+	ECU2PC_NotReadyToSwitchOn: INT := 9;
+	ECU2PC_ParkPosition: INT := 10;
+	ECU2PC_MontagePos: INT := 11;
+
+	(* Flag positions for variables Mast[x].FlagsPC2ECU *)
+	PC2ECU_MoveUp: INT := 0;
+	PC2ECU_MoveDown: INT := 1;
+	PC2ECU_SlowSpeed: INT := 2;
+
+	(* Flag positions for variable Mast[x].ErrorECU2PC *)
+	ECU2PC_ErrorFU: INT 					:= 0;
+	ECU2PC_ErrorCanTimeout: INT 			:= 1;
+	ECU2PC_ErrorFUPos: INT 					:= 6;
+	ECU2PC_ErrorEndschalterUnten1: INT 		:= 7;
+	ECU2PC_ErrorEndschalterUnten2: INT 		:= 8;
+	ECU2PC_ErrorCurrentLimit: INT			:= 9;
+	ECU2PC_ErrorSetMastHeight: INT			:= 10;
+
+	QSCMD_NOP: BYTE				:= 0;
+	QSCMD_CLEAR_ERROR: BYTE		:= 1;
+	QSCMD_QUICK_STOP: BYTE		:= 113;
+	QSCMD_HALT: BYTE			:= 114;
+	QSCMD_VELOCITY_MODE: BYTE	:= 117; (* QSData0 = desired velocity *)
+	QSCMD_ABS_POS_MODE: BYTE	:= 118; (* QSData0 = desired velocity, QSData1 = desired position *)
+
+	(* Flag positions for FU statusword *)
+	STAT_ENABLED: INT			:= 0;
+	STAT_ERROR: INT				:= 1;
+	STAT_WARNING: INT			:= 2;
+	STAT_MOVING: INT			:= 3;
+	STAT_REACHED: INT			:= 4;
+	STAT_LIMIT: INT				:= 5;
+	STAT_STOP_OR_HALT: INT		:= 11;
+
+	FU1_POS_TO_MM: REAL 		:= 3.2573E-004;
+
+	CAN_CHANNEL_HOST: BYTE 		:= 1;
+	CAN_CHANNEL_LOCAL: BYTE 	:= 2;
+
+	FU1_NODE_ID: BYTE			:= 127;
+
+END_VAR
+
+(* @OBJECT_END := 'Global_Constants' *)
+(* @CONNECTIONS := Global_Constants
+FILENAME : ''
+FILETIME : 0
+EXPORT : 0
+NUMOFCONNECTIONS : 0
+*)

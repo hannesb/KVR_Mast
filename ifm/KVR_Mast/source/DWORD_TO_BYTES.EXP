@@ -1,0 +1,22 @@
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/Misc' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+PROGRAM DWORD_TO_BYTES
+VAR_INPUT
+	dw: DWORD;
+END_VAR
+VAR_OUTPUT
+	ll: BYTE;
+	ml: BYTE;
+	mh: BYTE;
+	hh: BYTE;
+END_VAR
+
+(* @END_DECLARATION := '0' *)
+ll := DWORD_TO_BYTE(dw);
+ml := DWORD_TO_BYTE(SHR(dw, 8));
+mh := DWORD_TO_BYTE(SHR(dw, 16));
+hh := DWORD_TO_BYTE(SHR(dw, 24));
+END_PROGRAM

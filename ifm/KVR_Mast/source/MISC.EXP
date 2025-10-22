@@ -1,0 +1,38 @@
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/Steuerung' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+PROGRAM MISC
+VAR
+	TONInst: TON;
+	OtherError: BOOL;
+END_VAR
+(* @END_DECLARATION := '0' *)
+TONInst(IN := NOT TONInst.Q, PT:= T#500ms);
+IF TONInst.Q THEN
+	BlinkSlow := NOT BlinkSlow;
+END_IF
+
+IF NOT MasterPresent THEN
+	FlagsPC2ECU := 0;
+	Mast1FlagsPC2ECU := 0;
+END_IF
+
+Outputs.LEDAusgefahren := MastControl.mastOben;
+
+Outputs.LEDEingefahren := Mast1FlagsECU2PC.ECU2PC_ParkPosition;
+
+Outputs.LEDMontagePos := Mast1FlagsECU2PC.ECU2PC_MontagePos;
+
+IntVoltage := SUPPLY_VOLTAGE_VBBS;
+
+tasteAuf := inputs.TasteAusfahren OR Mast1FlagsPC2ECU.PC2ECU_MoveUp;
+tasteAb := inputs.TasteEinfahren OR Mast1FlagsPC2ECU.PC2ECU_MoveDown;
+
+IF tasteAuf AND tasteAb THEN
+	tasteAuf := FALSE;
+	tasteAb := FALSE;
+END_IF
+
+END_PROGRAM

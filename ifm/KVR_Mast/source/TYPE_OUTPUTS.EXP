@@ -1,0 +1,13 @@
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '' *)
+(* @OBJECTFLAGS := '0, 8' *)
+TYPE TYPE_OUTPUTS :
+	STRUCT
+		LEDAusgefahren: BOOL;
+		LEDEingefahren: BOOL;
+		LEDMontagePos: BOOL;
+		RelaisMotorLeistung: BOOL;
+		SchuetzGrundlast: BOOL;
+	END_STRUCT
+END_TYPE
+(* @END_DECLARATION := '0' *)

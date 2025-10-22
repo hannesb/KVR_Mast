@@ -1,0 +1,45 @@
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/Steuerung' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+PROGRAM Simulation
+VAR
+	cnt: WORD;
+END_VAR
+(* @END_DECLARATION := '0' *)
+IF NOT SIMULATIONSMODUS THEN
+	RETURN;
+END_IF
+
+inputs.EndschalterEingefahren := Mast1Height <= Mast1BottomPosition+2;
+
+IF Mast1Height < Mast1BottomPosition THEN
+	Mast1Height := Mast1BottomPosition;
+END_IF
+
+FU1_Current_Sim := 0;
+
+IF FU1_QSCmd = QSCMD_ABS_POS_MODE THEN
+	IF MastControl.zielposition > Mast1Height THEN
+		Mast1Height := Mast1Height + 1;
+		FU1_Current_Sim := 10;
+	END_IF
+	IF MastControl.zielposition < Mast1Height THEN
+		Mast1Height := Mast1Height - 1;
+		FU1_Current_Sim := 10;
+	END_IF
+ELSIF FU1_QSCmd = QSCMD_VELOCITY_MODE THEN
+	IF cnt > 0 THEN
+		cnt := cnt - 1;
+	ELSE
+		cnt := 10;
+		Mast1Height := Mast1Height - 1;
+	END_IF
+	IF Mast1Height = Mast1BottomPosition THEN
+		FU1_Current_Sim := 35;
+	ELSE
+		FU1_Current_Sim := 10;
+	END_IF
+END_IF
+END_PROGRAM

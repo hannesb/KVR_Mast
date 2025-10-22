@@ -1,0 +1,14 @@
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '' *)
+(* @OBJECTFLAGS := '0, 8' *)
+TYPE TYPE_INPUTS :
+	STRUCT
+		TasteAusfahren: BOOL;
+		TasteEinfahren: BOOL;
+		TastePoweredByGenerator: BOOL;
+		EndschalterNotantrieb: BOOL;
+		EndschalterEingefahren: BOOL;
+		EndschalterAufgerichtet: BOOL;
+	END_STRUCT
+END_TYPE
+(* @END_DECLARATION := '0' *)

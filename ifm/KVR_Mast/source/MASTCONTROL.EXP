@@ -1,0 +1,392 @@
+
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @PATH := '\/Steuerung' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+PROGRAM MastControl
+VAR_INPUT
+	init: BOOL;
+END_VAR
+VAR
+	aufbauen: BOOL;
+	abbauen: BOOL;
+	zielposition: WORD := 1;
+	rtTasteAuf: R_TRIG;
+	rtTasteAb: R_TRIG;
+	rtTasteReset: R_TRIG;
+	rtMastEingefahren: R_TRIG;
+	rtSystemEin: R_TRIG;
+	resetMasthoehe: BOOL;
+	masthoeheReal: REAL;
+	FUValue: DWORD;
+	SDOWriteOffset: CANOPEN_SDOWRITE;
+	SDOData: ARRAY[0..3] OF BYTE;
+	TSStart: DWORD;
+	tonSystemEin: TON;
+	tonKompressor: TON;
+	rtResetMasthoehe: R_TRIG;
+	statusOffset: BYTE := STATUS_IDLE;
+	tofInit: TOF;
+	mastPosKorrekt: BOOL := FALSE;
+	errorCode71x: BOOL;
+	handbetrieb: BOOL := TRUE;
+	blnk: BLINK;
+	triggerResetMasthoehe: BOOL := FALSE;
+	abbauenNullfahrt: BOOL;
+	masthoeheSchleichfahrt: WORD;
+	masthoeheEndschalter: WORD;
+	masthoeheAbsetzen: WORD;
+	mastAbsetzen: BOOL := FALSE;
+	mastOben: BOOL := FALSE;
+	flagTmp: BOOL;
+	(* SDOWriteSave: CANOPEN_SDOWRITE; *)
+END_VAR
+VAR CONSTANT
+	_100ms: DWORD := 100000;
+	STATUS_IDLE: BYTE := 0;
+	STATUS_SETUP_OFFSET: BYTE := 1;
+	STATUS_WRITE_OFFSET: BYTE := 2;
+	(* STATUS_SETUP_SAVE: BYTE := 3; *)
+	(* STATUS_WRITE_SAVE: BYTE := 4; *)
+END_VAR
+
+(* @END_DECLARATION := '0' *)
+
+IF NOT SIMULATIONSMODUS THEN
+	masthoeheReal := DINT_TO_REAL(FU1_Position) * FU1_POS_TO_MM;
+	Mast1Height := REAL_TO_WORD(masthoeheReal);
+	Mast1Current := FU1_Current;
+ELSE
+	Mast1Current := FU1_Current_Sim;
+END_IF
+Mast1FUErrorCode := FU1_ErrorCode;
+Mast1Speed := FU1_Velocity;
+
+(******************* Diverse Timer *******************)
+tonSystemEin(IN := TRUE, PT := T#1000ms);
+tofInit(IN := init, PT := T#5s);
+rtSystemEin(CLK := NOT tofInit.Q);
+blnk(ENABLE := TRUE, TIMELOW := T#200ms, TIMEHIGH := T#200ms);
+
+(******************* Initialisierungen *******************)
+outputs.RelaisMotorLeistung := FALSE;
+FU1_QSCmd := QSCMD_HALT;
+masthoeheSchleichfahrt := Mast1BottomPosition + Mast1BottomPositionOffset;
+masthoeheEndschalter := Mast1BottomPosition + Mast1BottomLimitSwitchWindow;
+masthoeheAbsetzen := Mast1TopPosition - Mast1TopSettlingOffset;
+abbauenNullfahrt := FALSE;
+
+(******************* Tasten Flankenerkennung *******************)
+rtTasteAuf(CLK := tasteAuf);
+rtTasteAb(CLK := tasteAb);
+rtTasteReset(CLK := tasteAuf AND tasteAb);
+
+(******************* Flag Mast-Position korrekt falls Endschalter betätigt und Masthöhe plausibel *******************)
+(******************* -> Fehlermeldung Masthöhe unterdrücken, keine Nullfahrt notwendig *******************)
+IF rtSystemEin.Q THEN
+	mastPosKorrekt :=
+		inputs.EndschalterEingefahren
+		AND Mast1BottomPosition - 2 <= Mast1Height
+		AND Mast1Height <= Mast1BottomPosition + 2;
+END_IF
+
+(******************* Taste Reset *******************)
+IF rtTasteReset.Q THEN
+	(* Positionsfehler FU hier nicht zuruecksetzen *)
+	flagTmp := Mast1ErrorECU2PC.ECU2PC_ErrorFUPos;
+	Mast1ErrorECU2PC := 0;
+	Mast1ErrorECU2PC.ECU2PC_ErrorFUPos := flagTmp;
+END_IF
+
+(******************* Fehlermeldungen *******************)
+Mast1ErrorECU2PC.ECU2PC_ErrorCanTimeout := NOT canNodeFU1Present AND NOT SIMULATIONSMODUS;
+
+(* Auswertung FU Fehlercode *)
+(* -710 -> Position unbekannt *)
+(* -711 -> Positionswert ungültig *)
+errorCode71x := FU1_ErrorCode = -710 OR FU1_ErrorCode = -711;
+
+IF canNodeFU1Present AND tonSystemEin.Q AND FU1_ErrorCode <> 0 THEN
+	IF errorCode71x THEN
+		IF NOT inputs.EndschalterEingefahren AND NOT mastPosKorrekt THEN
+			Mast1ErrorECU2PC.ECU2PC_ErrorFUPos := TRUE;
+		END_IF
+	ELSE
+		Mast1ErrorECU2PC.ECU2PC_ErrorFU := TRUE;
+	END_IF
+END_IF
+IF Mast1Height > masthoeheSchleichfahrt AND inputs.EndschalterEingefahren AND NOT Mast1ErrorECU2PC.ECU2PC_ErrorFUPos AND NOT tofinit.q THEN
+	Mast1ErrorECU2PC.ECU2PC_ErrorEndschalterUnten1 := TRUE;
+END_IF
+
+(******************* Taste Auf Hand/Auto *******************)
+IF rtTasteAuf.Q AND NOT tasteAb THEN
+	IF abbauen THEN
+		abbauen := FALSE;
+	ELSE
+		aufbauen := NOT aufbauen;
+	END_IF
+END_IF
+IF NOT tasteAuf AND handbetrieb
+ THEN
+	aufbauen := FALSE;
+END_IF
+
+(******************* Taste Ab Hand/Auto *******************)
+IF rtTasteAb.Q AND NOT tasteAuf THEN
+	IF aufbauen THEN
+		aufbauen := FALSE;
+	ELSE
+		abbauen := NOT abbauen;
+	END_IF
+END_IF
+IF NOT tasteAuf AND handbetrieb THEN
+	abbauen := tasteAb;
+END_IF
+
+(******************* Fehler *******************)
+IF ABS(Mast1Current) > Mast1CurrentLimit THEN
+	Mast1ErrorECU2PC.ECU2PC_ErrorCurrentLimit := TRUE;
+END_IF
+
+(******************* Not-Aus / System Aus / Fehler *******************)
+IF NOT tonSystemEin.Q OR Mast1ErrorECU2PC <> 0 THEN
+	aufbauen := FALSE;
+    IF abbauen AND (Mast1ErrorECU2PC.ECU2PC_ErrorFUPos OR NOT mastPosKorrekt) THEN
+		abbauenNullfahrt := TRUE;
+	END_IF
+	abbauen := FALSE;
+END_IF
+
+(******************* Zielposition *******************)
+IF aufbauen THEN
+	IF inputs.EndschalterAufgerichtet THEN
+		zielposition := Mast1TopPosition;
+	ELSE
+		zielposition := Mast1MontagePos;
+	END_IF
+END_IF
+IF abbauen THEN
+	zielposition := Mast1BottomPosition;
+END_IF
+
+(******************* Aufbauen beendet? *******************)
+IF aufbauen AND Mast1Height >= zielposition THEN
+	aufbauen := FALSE;
+	IF Mast1Height >= Mast1TopPosition THEN
+		mastAbsetzen := TRUE;
+	END_IF
+END_IF
+
+(******************* Abbauen beendet? *******************)
+IF abbauen AND Mast1Height <= Mast1BottomPosition THEN
+	abbauen := FALSE;
+END_IF
+
+(******************* Mast absetzen beendet? *******************)
+IF mastAbsetzen AND Mast1Height <= masthoeheAbsetzen THEN
+	mastAbsetzen := FALSE;
+	mastOben := TRUE;
+END_IF
+
+(******************* Fahrbefehle Aufbauen *******************)
+IF aufbauen THEN
+	mastOben := FALSE;
+	FU1_QSData0 := Mast1VelocityNormal;
+	FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(zielposition)/FU1_POS_TO_MM);
+	FU1_QSCmd := QSCMD_ABS_POS_MODE;
+END_IF
+
+(******************* Fahrbefehle Abbauen *******************)
+IF abbauen THEN
+	mastOben := FALSE;
+	IF Mast1Height > masthoeheSchleichfahrt THEN
+		(* Oberhalb Position Schleichfahrt: Normale Geschwindigkeit *)
+		IF NOT resetMasthoehe THEN
+			FU1_QSData0 := Mast1VelocityNormal;
+			FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(masthoeheSchleichfahrt)/FU1_POS_TO_MM);
+			FU1_QSCmd := QSCMD_ABS_POS_MODE;
+		END_IF
+	ELSIF Mast1Height > Mast1BottomPosition THEN
+		(* Unterhalb Position Schleichfahrt: Langsame Geschwindigkeit *)
+		IF ABS(Mast1Current) > Mast1CurrentLimitBottom THEN
+			Mast1ErrorECU2PC.ECU2PC_ErrorCurrentLimit := TRUE;
+		ELSIF NOT inputs.EndschalterEingefahren THEN
+			Mast1ErrorECU2PC.ECU2PC_ErrorEndschalterUnten2 := TRUE;
+		ELSIF NOT resetMasthoehe THEN
+			FU1_QSData0 := Mast1VelocityBottom;
+	        FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(Mast1BottomPosition)/FU1_POS_TO_MM);
+			FU1_QSCmd := QSCMD_ABS_POS_MODE;
+		END_IF
+	END_IF
+END_IF
+
+(******************* Fahrbefehle Abbauen Nullfahrt *******************)
+IF abbauenNullfahrt THEN
+	mastOben := FALSE;
+	IF ABS(Mast1Current) > Mast1CurrentLimitBottom THEN
+		Mast1ErrorECU2PC.ECU2PC_ErrorCurrentLimit := TRUE;
+	ELSIF NOT resetMasthoehe THEN
+		IF NOT mastPosKorrekt THEN
+			(* Velocity mode: pos = auffahren, neg = einfahren *)
+			FU1_QSData0 := -Mast1VelocityBottom;
+			FU1_QSCmd := QSCMD_VELOCITY_MODE;
+		END_IF
+	END_IF
+END_IF
+
+(******************* Fahrbefehle Mast auf Riegel absetzen *******************)
+IF mastAbsetzen THEN
+	mastOben := FALSE;
+	FU1_QSData0 := Mast1VelocityNormal;
+	FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(masthoeheAbsetzen)/FU1_POS_TO_MM);
+	FU1_QSCmd := QSCMD_ABS_POS_MODE;
+END_IF
+
+(******************* FU-Fehler zurücksetzen *******************)
+IF rtTasteReset.Q OR errorCode71x OR NOT tonSystemEin.Q AND blnk.OUT THEN
+	FU1_QSCmd := QSCMD_CLEAR_ERROR;
+	IF NOT errorCode71x THEN
+    	aufbauen := FALSE;
+    	abbauen := FALSE;
+	END_IF
+END_IF
+
+(******************* K1 Versorgung Motor *******************)
+outputs.RelaisMotorLeistung := TRUE;
+
+(******************* Masthöhe in FU schreiben bei Schleichfahrt auf Endschalter *******************)
+rtMastEingefahren(CLK := inputs.EndschalterEingefahren);
+IF NOT resetMasthoehe
+	AND rtMastEingefahren.Q
+	AND (Mast1BottomPosition < Mast1Height AND Mast1Height < masthoeheSchleichfahrt OR abbauenNullfahrt OR tofInit.Q)
+	(* Reset nach Einschalten verhindern *)
+	(* AND NOT tofInit.Q *)
+THEN
+	resetMasthoehe := TRUE;
+END_IF
+
+
+(******************* Masthöhe in FU schreiben falls von Host angefordert *******************)
+rtResetMasthoehe(CLK := Mast1SetEncoderPW = 333777333);
+IF rtResetMasthoehe.Q THEN
+	IF NOT resetMasthoehe
+		AND FU1_QSCmd = QSCMD_HALT
+		AND inputs.EndschalterEingefahren
+	THEN
+		resetMasthoehe := TRUE;
+	ELSE
+		Mast1SetEncoderPW := 101;
+	END_IF
+END_IF
+
+(******************* Schrittkette Masthöhe in FU schreiben *******************)
+CASE statusOffset OF
+	STATUS_IDLE:
+		IF resetMasthoehe THEN
+			statusOffset := STATUS_SETUP_OFFSET;
+		END_IF
+
+	STATUS_SETUP_OFFSET:
+		(* Masthöhe für Endschalter-Position in FU schreiben *)
+		FUValue := REAL_TO_DWORD(masthoeheEndschalter/FU1_POS_TO_MM);
+		DWORD_TO_BYTES(
+			dw := FUValue,
+			ll => SDOData[0],
+			ml => SDOData[1],
+			mh => SDOData[2],
+			hh => SDOData[3]);
+		TSStart := PLC_CYCLE.cycle;
+		statusOffset := STATUS_WRITE_OFFSET;
+
+	STATUS_WRITE_OFFSET:
+		IF PLC_CYCLE.cycle - TSStart > 2*_100ms THEN
+			(* 200ms warten, dann prüfen ob Masthöhe unterer Position entspricht *)
+			resetMasthoehe := FALSE;
+			(* Fehlermeldung Mastposition zurücksetzen *)
+			Mast1ErrorECU2PC.ECU2PC_ErrorFUPos := FALSE;
+			IF Mast1Height = masthoeheEndschalter THEN
+				mastPosKorrekt := TRUE;
+				(* statusOffset := STATUS_SETUP_SAVE; 'save' nicht mehr an FU schicken *)
+				statusOffset := STATUS_IDLE;
+			ELSE
+				Mast1ErrorECU2PC.ECU2PC_ErrorSetMastHeight := TRUE;
+				CASE SDOWriteOffset.RESULT OF
+					1: (* FB-Ausführung wurde ohne Fehler beendet, Daten sind gültig *)
+						Mast1SetEncoderPW := 102;
+					32: (* SDO-Übertragung abgebrochen von Client oder Server *)
+						Mast1SetEncoderPW := 103;
+					33: (* TIMEOUT ist abgelaufen *)
+						Mast1SetEncoderPW := 104;
+					242: (* Fehler: Einstellung ist nicht möglich *)
+						Mast1SetEncoderPW := 105;
+					ELSE
+						Mast1SetEncoderPW := 106;
+				END_CASE
+				statusOffset := STATUS_IDLE;
+			END_IF
+		END_IF
+
+	(*
+	STATUS_SETUP_SAVE:
+		(* Parameter permanent in FU speichern *)
+		TSStart := PLC_CYCLE.cycle;
+		DWORD_TO_BYTES(
+			dw := 16#65766173, (* 'save' *)
+			ll => SDOData[0],
+			ml => SDOData[1],
+			mh => SDOData[2],
+			hh => SDOData[3]);
+		statusOffset := STATUS_WRITE_SAVE;
+
+	STATUS_WRITE_SAVE:
+		IF SDOWriteSave.RESULT = 1 OR PLC_CYCLE.cycle - TSStart > 110*_100ms THEN
+			CASE SDOWriteSave.RESULT OF
+				1: (* FB-Ausführung wurde ohne Fehler beendet, Daten sind gültig *)
+					Mast1SetEncoderPW := 0;
+					Mast1ErrorECU2PC.ECU2PC_ErrorSetMastHeight := FALSE;
+				32: (* SDO-Übertragung abgebrochen von Client oder Server *)
+					Mast1SetEncoderPW := 113;
+					Mast1ErrorECU2PC.ECU2PC_ErrorSetMastHeight := TRUE;
+				33: (* TIMEOUT ist abgelaufen *)
+					Mast1SetEncoderPW := 114;
+					Mast1ErrorECU2PC.ECU2PC_ErrorSetMastHeight := TRUE;
+				242: (* Fehler: Einstellung ist nicht möglich *)
+					Mast1SetEncoderPW := 115;
+					Mast1ErrorECU2PC.ECU2PC_ErrorSetMastHeight := TRUE;
+				ELSE
+					Mast1SetEncoderPW := 116;
+					Mast1ErrorECU2PC.ECU2PC_ErrorSetMastHeight := TRUE;
+			END_CASE
+			statusOffset := STATUS_IDLE;
+		END_IF
+	*)
+END_CASE
+
+(******************* SDO-Befehle *******************)
+
+SDOWriteOffset(
+	EXECUTE := statusOffset = STATUS_WRITE_OFFSET,
+	CHANNEL := CAN_CHANNEL_LOCAL,
+	NODE := FU1_NODE_ID,
+	IDX := 16#4762,
+	SUBIDX := 1,
+	LEN := 4,
+	DATA := SDOData,
+	Timeout := T#100ms,
+	RESULT => );
+
+(*
+SDOWriteSave(
+	EXECUTE := statusOffset = STATUS_WRITE_SAVE,
+	CHANNEL := CAN_CHANNEL_LOCAL,
+	NODE := FU1_NODE_ID,
+	IDX := 16#1010,
+	SUBIDX := 6,
+	LEN := 4,
+	DATA := SDOData,
+	Timeout := T#10s,
+	RESULT => );
+*)
+
+END_PROGRAM

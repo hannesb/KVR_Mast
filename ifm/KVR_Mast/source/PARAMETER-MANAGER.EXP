@@ -1,0 +1,326 @@
+PARAMETERMANAGER
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<parameter-manager>
+	<parameterlists>
+		<parameterlist type="variables" name="Parameters">
+			<settings>
+				<synchronous>true</synchronous>
+			</settings>
+			<entry-list>
+				<entry>
+					<values>
+						<standard key="Name">Mast1SetEncoderPW</standard>
+						<standard key="Index">16#2014</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="5">.Mast1SetEncoderPW</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">SettingsPW</standard>
+						<standard key="Index">16#2000</standard>
+						<standard key="SubIndex">16#C</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="5">.SettingsPW</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1TopPosition</standard>
+						<standard key="Index">16#2006</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="3">.Mast1TopPosition</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1BottomPosition</standard>
+						<standard key="Index">16#2007</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="3">.Mast1BottomPosition</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1VelocityNormal</standard>
+						<standard key="Index">16#200A</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="1">.Mast1VelocityNormal</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1VelocityBottom</standard>
+						<standard key="Index">16#200C</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="1">.Mast1VelocityBottom</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1BottomPositionOffset</standard>
+						<standard key="Index">16#200D</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="3">.Mast1BottomPositionOffset</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1CurrentLimitBottom</standard>
+						<standard key="Index">16#200E</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="1">.Mast1CurrentLimitBottom</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1MotorActiveTimeSeconds</standard>
+						<standard key="Index">16#2013</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="5">.Mast1MotorActiveTimeSeconds</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1CurrentLimit</standard>
+						<standard key="Index">16#2018</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="1">.Mast1CurrentLimit</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1MontagePos</standard>
+						<standard key="Index">16#2010</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="3">.Mast1MontagePos</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1BottomLimitSwitchWindow</standard>
+						<standard key="Index">16#200F</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="3">.Mast1BottomLimitSwitchWindow</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1TopSettlingOffset</standard>
+						<standard key="Index">16#2019</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="1">.Mast1TopSettlingOffset</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+			</entry-list>
+		</parameterlist>
+		<parameterlist type="variables" name="proc_vars_ecu">
+			<settings>
+				<synchronous>true</synchronous>
+			</settings>
+			<entry-list>
+				<entry>
+					<values>
+						<standard key="Name">FlagsECU2PC</standard>
+						<standard key="Index">16#3000</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="3">.FlagsECU2PC</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">FlagsPC2ECU</standard>
+						<standard key="Index">16#3000</standard>
+						<standard key="SubIndex">16#2</standard>
+						<standard key="Accessright"><![CDATA[write only]]></standard>
+						<standard key="Variable" type-class="3">.FlagsPC2ECU</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Windspeed</standard>
+						<standard key="Index">16#3000</standard>
+						<standard key="SubIndex">16#3</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="2">.Windspeed</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Temperature</standard>
+						<standard key="Index">16#3000</standard>
+						<standard key="SubIndex">16#4</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="14">.CabinetTemperature</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">ExtTemperature</standard>
+						<standard key="Index">16#3000</standard>
+						<standard key="SubIndex">16#5</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="14">.ExtTemperature</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">IntVoltage</standard>
+						<standard key="Index">16#3000</standard>
+						<standard key="SubIndex">16#6</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="3">.IntVoltage</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+			</entry-list>
+		</parameterlist>
+		<parameterlist type="variables" name="version_info">
+			<settings>
+				<synchronous>true</synchronous>
+			</settings>
+			<entry-list>
+				<entry>
+					<values>
+						<standard key="Name">Version</standard>
+						<standard key="Index">16#3020</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="2">.Version</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">VersionDate</standard>
+						<standard key="Index">16#3020</standard>
+						<standard key="SubIndex">16#2</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="5">.VersionDate</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+			</entry-list>
+		</parameterlist>
+		<parameterlist type="variables" name="proc_vars_mast1">
+			<settings>
+				<synchronous>true</synchronous>
+			</settings>
+			<entry-list>
+				<entry>
+					<values>
+						<standard key="Name">Mast1Height</standard>
+						<standard key="Index">16#3001</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="3">.Mast1Height</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1FlagsECU2PC</standard>
+						<standard key="Index">16#3003</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="3">.Mast1FlagsECU2PC</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1FlagsPC2ECU</standard>
+						<standard key="Index">16#3004</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[write only]]></standard>
+						<standard key="Variable" type-class="3">.Mast1FlagsPC2ECU</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1Current</standard>
+						<standard key="Index">16#3006</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="4">.Mast1Current</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1ErrorECU2PC</standard>
+						<standard key="Index">16#300D</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="3">.Mast1ErrorECU2PC</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1FUErrorCode</standard>
+						<standard key="Index">16#3010</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="3">.Mast1FUErrorCode</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1Speed</standard>
+						<standard key="Index">16#3013</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="4">.Mast1Speed</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1MotorActiveTimeSeconds2</standard>
+						<standard key="Index">16#3014</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="5">.Mast1MotorActiveTimeSeconds2</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+			</entry-list>
+		</parameterlist>
+	</parameterlists>
+</parameter-manager>
+END_PARAMETERMANAGER

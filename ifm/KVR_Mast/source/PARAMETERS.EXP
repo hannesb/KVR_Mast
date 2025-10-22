@@ -1,0 +1,27 @@
+(* @NESTEDCOMMENTS := 'Yes' *)
+(* @GLOBAL_VARIABLE_LIST := 'Parameters' *)
+(* @PATH := '' *)
+(* @OBJECTFLAGS := '0, 8' *)
+(* @SYMFILEFLAGS := '2048' *)
+VAR_GLOBAL RETAIN
+	SettingsPW: DWORD := 0	 					{parameter list=Parameters [name=SettingsPW					 	index=16#2000 subindex=12 accessright="read-write"] };
+	Mast1TopPosition: WORD := 9000 				{parameter list=Parameters [name=Mast1TopPosition 				index=16#2006 subindex=1 accessright="read-write"] };
+	Mast1BottomPosition: WORD := 1675			{parameter list=Parameters [name=Mast1BottomPosition			index=16#2007 subindex=1 accessright="read-write"] };
+	Mast1VelocityNormal: INT := 2500			{parameter list=Parameters [name=Mast1VelocityNormal			index=16#200A subindex=1 accessright="read-write"] };
+	Mast1VelocityBottom: INT := 500				{parameter list=Parameters [name=Mast1VelocityBottom			index=16#200C subindex=1 accessright="read-write"] };
+	Mast1BottomPositionOffset: WORD := 130		{parameter list=Parameters [name=Mast1BottomPositionOffset		index=16#200D subindex=1 accessright="read-write"] };
+	Mast1CurrentLimitBottom: INT := 30			{parameter list=Parameters [name=Mast1CurrentLimitBottom		index=16#200E subindex=1 accessright="read-write"] };
+	Mast1BottomLimitSwitchWindow: WORD := 100	{parameter list=Parameters [name=Mast1BottomLimitSwitchWindow	index=16#200F subindex=1 accessright="read-write"] };
+	Mast1MontagePos: WORD := 2000 				{parameter list=Parameters [name=Mast1MontagePos 				index=16#2010 subindex=1 accessright="read-write"] };
+	Mast1MotorActiveTimeSeconds: DWORD := 0		{parameter list=Parameters [name=Mast1MotorActiveTimeSeconds	index=16#2013 subindex=1 accessright="read-write"] };
+	Mast1CurrentLimit: INT := 40				{parameter list=Parameters [name=Mast1CurrentLimit				index=16#2018 subindex=1 accessright="read-write"] };
+	Mast1TopSettlingOffset: INT := 40			{parameter list=Parameters [name=Mast1TopSettlingOffset			index=16#2019 subindex=1 accessright="read-write"] };
+END_VAR
+
+(* @OBJECT_END := 'Parameters' *)
+(* @CONNECTIONS := Parameters
+FILENAME : ''
+FILETIME : 0
+EXPORT : 0
+NUMOFCONNECTIONS : 0
+*)
