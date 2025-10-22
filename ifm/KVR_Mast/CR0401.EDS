@@ -5,11 +5,11 @@ Line1=Mandatory Comment.
 FileName=CR0401.EDS
 FileVersion=1
 FileRevision=1
-Description=EDS for CoDeSys-Project: D:\Daten!\docs\Kunden\Elnic\2025\KVR_Mast\ifm\KVR_Mast\KVR_Mast.pro
-CreationTime=08:25AM
+Description=EDS for CoDeSys-Project: D:\Projekte\Geroh\KVR_Mast\ifm\KVR_Mast\KVR_Mast.pro
+CreationTime=04:55PM
 CreationDate=10-22-2025
 CreatedBy=CoDeSys
-ModificationTime=08:25AM
+ModificationTime=04:55PM
 ModificationDate=10-22-2025
 ModifiedBy=CoDeSys
 EDSVersion=4.0
@@ -773,7 +773,7 @@ ParameterName=.Mast1TopPosition
 ObjectType=0x7
 DataType=0x6
 AccessType=rw
-DefaultValue=9000
+DefaultValue=3000
 PDOMapping=0
 
 [2007]

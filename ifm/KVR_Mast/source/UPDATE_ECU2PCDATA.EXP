@@ -14,26 +14,6 @@ FlagsECU2PC.ECU2PC_RemoteAckn := FALSE;
 
 FlagsECU2PC.ECU2PC_MainSwitch := TRUE;
 
-Mast1FlagsECU2PC.ECU2PC_TopPosition := MastControl.mastOben;
-
-Mast1FlagsECU2PC.ECU2PC_BottomPosition := Mast1Height >= Mast1BottomPosition-1 AND Mast1Height <= Mast1BottomPosition+1;
-
-Mast1FlagsECU2PC.ECU2PC_MovingUp := MastControl.aufbauen OR MastControl.mastAbsetzen;
-
-Mast1FlagsECU2PC.ECU2PC_MovingDown := MastControl.abbauen;
-
-Mast1FlagsECU2PC.ECU2PC_LocalUp := Inputs.TasteAusfahren;
-
-Mast1FlagsECU2PC.ECU2PC_LocalDown := Inputs.TasteEinfahren;
-
-Mast1FlagsECU2PC.ECU2PC_LimitSwitch4m := FALSE;
-
-Mast1FlagsECU2PC.ECU2PC_LimitSwitchBottom := Inputs.EndschalterEingefahren;
-
-Mast1FlagsECU2PC.ECU2PC_ParkPosition := Mast1FlagsECU2PC.ECU2PC_BottomPosition;
-
-Mast1FlagsECU2PC.ECU2PC_MontagePos := NOT inputs.EndschalterAufgerichtet AND Mast1Height >= Mast1MontagePos-1 AND Mast1Height <= Mast1MontagePos+1;
-
 Mast1MotorActiveTimeSeconds2 := Mast1MotorActiveTimeSeconds;
 
 

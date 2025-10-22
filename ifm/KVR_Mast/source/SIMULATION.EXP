@@ -12,6 +12,7 @@ IF NOT SIMULATIONSMODUS THEN
 	RETURN;
 END_IF
 
+(*
 inputs.EndschalterEingefahren := Mast1Height <= Mast1BottomPosition+2;
 
 IF Mast1Height < Mast1BottomPosition THEN
@@ -42,4 +43,5 @@ ELSIF FU1_QSCmd = QSCMD_VELOCITY_MODE THEN
 		FU1_Current_Sim := 10;
 	END_IF
 END_IF
+*)
 END_PROGRAM

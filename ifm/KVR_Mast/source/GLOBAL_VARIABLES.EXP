@@ -16,6 +16,7 @@ VAR_GLOBAL
 
 	tasteAuf: BOOL;
 	tasteAb: BOOL;
+	tasteReset: BOOL;
 
 	FlagsECU2PC: WORD			{parameter list=proc_vars_ecu [name=FlagsECU2PC 					index=16#3000 subindex=1 accessright="read only"] };
 	FlagsPC2ECU: WORD			{parameter list=proc_vars_ecu [name=FlagsPC2ECU 					index=16#3000 subindex=2 accessright="write only"] };

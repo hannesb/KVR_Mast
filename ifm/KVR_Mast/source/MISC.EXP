@@ -7,6 +7,7 @@ PROGRAM MISC
 VAR
 	TONInst: TON;
 	OtherError: BOOL;
+	TOFReset: TOF;
 END_VAR
 (* @END_DECLARATION := '0' *)
 TONInst(IN := NOT TONInst.Q, PT:= T#500ms);
@@ -19,20 +20,25 @@ IF NOT MasterPresent THEN
 	Mast1FlagsPC2ECU := 0;
 END_IF
 
-Outputs.LEDAusgefahren := MastControl.mastOben;
+IF Mast1ErrorECU2PC <> 0 OR MastControl.status >= 100 THEN
+	Outputs.LEDAusgefahren := BlinkSlow;
+	Outputs.LEDEingefahren := NOT BlinkSlow;
+ELSE
+	Outputs.LEDAusgefahren := Mast1FlagsECU2PC.ECU2PC_TopPosition;
+	Outputs.LEDEingefahren := Mast1FlagsECU2PC.ECU2PC_ParkPosition;
+END_IF
 
-Outputs.LEDEingefahren := Mast1FlagsECU2PC.ECU2PC_ParkPosition;
 
 Outputs.LEDMontagePos := Mast1FlagsECU2PC.ECU2PC_MontagePos;
 
 IntVoltage := SUPPLY_VOLTAGE_VBBS;
 
-tasteAuf := inputs.TasteAusfahren OR Mast1FlagsPC2ECU.PC2ECU_MoveUp;
-tasteAb := inputs.TasteEinfahren OR Mast1FlagsPC2ECU.PC2ECU_MoveDown;
+tasteReset := (tasteAuf AND tasteAb);
+TOFReset(IN := tasteReset, PT := T#500ms);
+tasteAuf := NOT TOFReset.Q AND (inputs.TasteAusfahren OR Mast1FlagsPC2ECU.PC2ECU_MoveUp);
+tasteAb := NOT TOFReset.Q AND (inputs.TasteEinfahren OR Mast1FlagsPC2ECU.PC2ECU_MoveDown);
 
-IF tasteAuf AND tasteAb THEN
-	tasteAuf := FALSE;
-	tasteAb := FALSE;
-END_IF
+
+
 
 END_PROGRAM
