@@ -31,6 +31,7 @@ VAR_GLOBAL
 	Mast1Current: DINT			{parameter list=proc_vars_mast1 [name=Mast1Current 					index=16#3006 subindex=1 accessright="read only"] };
 	Mast1ErrorECU2PC: WORD		{parameter list=proc_vars_mast1 [name=Mast1ErrorECU2PC				index=16#300D subindex=1 accessright="read only"] };
 	Mast1FUErrorCode: WORD		{parameter list=proc_vars_mast1 [name=Mast1FUErrorCode				index=16#3010 subindex=1 accessright="read only"] };
+	Mast1State: BYTE			{parameter list=proc_vars_mast1 [name=Mast1State					index=16#3012 subindex=1 accessright="read only"] };
 	Mast1Speed: DINT			{parameter list=proc_vars_mast1 [name=Mast1Speed					index=16#3013 subindex=1 accessright="read only"] };
 
 	(*

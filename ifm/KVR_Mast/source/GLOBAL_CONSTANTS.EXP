@@ -32,6 +32,7 @@ VAR_GLOBAL CONSTANT
 	ECU2PC_NotReadyToSwitchOn: INT := 9;
 	ECU2PC_ParkPosition: INT := 10;
 	ECU2PC_MontagePos: INT := 11;
+	ECU2PC_LimitSwitchAufgerichtet: INT := 12;
 
 	(* Flag positions for variables Mast[x].FlagsPC2ECU *)
 	PC2ECU_MoveUp: INT := 0;
@@ -41,11 +42,7 @@ VAR_GLOBAL CONSTANT
 	(* Flag positions for variable Mast[x].ErrorECU2PC *)
 	ECU2PC_ErrorFU: INT 					:= 0;
 	ECU2PC_ErrorCanTimeout: INT 			:= 1;
-	ECU2PC_ErrorFUPos: INT 					:= 6;
-	ECU2PC_ErrorEndschalterUnten1: INT 		:= 7;
-	ECU2PC_ErrorEndschalterUnten2: INT 		:= 8;
-	ECU2PC_ErrorCurrentLimit: INT			:= 9;
-	ECU2PC_ErrorSetMastHeight: INT			:= 10;
+	ECU2PC_ErrorMastSchrittkette: INT 		:= 4;
 
 	QSCMD_NOP: BYTE				:= 0;
 	QSCMD_CLEAR_ERROR: BYTE		:= 1;

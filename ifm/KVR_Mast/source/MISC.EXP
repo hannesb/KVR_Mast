@@ -28,7 +28,6 @@ ELSE
 	Outputs.LEDEingefahren := Mast1FlagsECU2PC.ECU2PC_ParkPosition;
 END_IF
 
-
 Outputs.LEDMontagePos := Mast1FlagsECU2PC.ECU2PC_MontagePos;
 
 IntVoltage := SUPPLY_VOLTAGE_VBBS;

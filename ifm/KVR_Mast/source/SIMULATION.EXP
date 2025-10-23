@@ -4,29 +4,41 @@
 (* @OBJECTFLAGS := '0, 8' *)
 (* @SYMFILEFLAGS := '2048' *)
 PROGRAM Simulation
+VAR_INPUT
+	init: BOOL;
+END_VAR
 VAR
 	cnt: WORD;
+	zielposition: WORD;
+	aufgerichtet: BOOL := TRUE;
+	notantrieb: BOOL := FALSE;
 END_VAR
 (* @END_DECLARATION := '0' *)
 IF NOT SIMULATIONSMODUS THEN
 	RETURN;
 END_IF
 
-(*
-inputs.EndschalterEingefahren := Mast1Height <= Mast1BottomPosition+2;
-
-IF Mast1Height < Mast1BottomPosition THEN
+IF init THEN
 	Mast1Height := Mast1BottomPosition;
 END_IF
-
+(*
+IF MastControl.status = MastControl.STATUS_WRITE_OFFSET THEN
+	Mast1Height := Mast1BottomPosition + Mast1BottomLimitSwitchWindow;
+END_IF
+*)
 FU1_Current_Sim := 0;
 
+zielposition := REAL_TO_WORD(FU1_QSData1*FU1_POS_TO_MM);
+inputs.EndschalterEingefahren := Mast1Height <= Mast1BottomPosition + Mast1BottomLimitSwitchWindow;
+inputs.EndschalterAufgerichtet := aufgerichtet;
+inputs.EndschalterNotantrieb := notantrieb;
+
 IF FU1_QSCmd = QSCMD_ABS_POS_MODE THEN
-	IF MastControl.zielposition > Mast1Height THEN
+	IF zielposition > Mast1Height THEN
 		Mast1Height := Mast1Height + 1;
 		FU1_Current_Sim := 10;
 	END_IF
-	IF MastControl.zielposition < Mast1Height THEN
+	IF zielposition < Mast1Height THEN
 		Mast1Height := Mast1Height - 1;
 		FU1_Current_Sim := 10;
 	END_IF
@@ -43,5 +55,4 @@ ELSIF FU1_QSCmd = QSCMD_VELOCITY_MODE THEN
 		FU1_Current_Sim := 10;
 	END_IF
 END_IF
-*)
 END_PROGRAM

@@ -7,14 +7,31 @@ PROGRAM UPDATE_ECU2PCDATA
 (* @END_DECLARATION := '0' *)
 
 FlagsECU2PC.ECU2PC_AllowRemote := TRUE;
-
-FlagsECU2PC.ECU2PC_EmergencyStop := FALSE;
-
+FlagsECU2PC.ECU2PC_EmergencyStop := Inputs.EndschalterNotantrieb;
 FlagsECU2PC.ECU2PC_RemoteAckn := FALSE;
-
 FlagsECU2PC.ECU2PC_MainSwitch := TRUE;
 
 Mast1MotorActiveTimeSeconds2 := Mast1MotorActiveTimeSeconds;
+Mast1State := MastControl.status;
+
+(******************* ECU to PC flags *******************)
+Mast1FlagsECU2PC.ECU2PC_TopPosition := (MastControl.status = MastControl.STATUS_AUSGEFAHREN);
+Mast1FlagsECU2PC.ECU2PC_BottomPosition := (MastControl.status = MastControl.STATUS_EINGEFAHREN);
+Mast1FlagsECU2PC.ECU2PC_MovingUp :=
+	FU1_QSCmd = QSCmd_ABS_POS_MODE AND Mast1Height < REAL_TO_WORD(FU1_QSData1*FU1_POS_TO_MM)
+	OR
+	FU1_QSCmd = QSCMD_VELOCITY_MODE AND FU1_QSData0*FU1_POS_TO_MM > 0;
+Mast1FlagsECU2PC.ECU2PC_MovingDown :=
+	FU1_QSCmd = QSCmd_ABS_POS_MODE AND Mast1Height > REAL_TO_WORD(FU1_QSData1*FU1_POS_TO_MM)
+	OR
+	FU1_QSCmd = QSCMD_VELOCITY_MODE AND FU1_QSData0*FU1_POS_TO_MM < 0;
+Mast1FlagsECU2PC.ECU2PC_LocalUp := Inputs.TasteAusfahren;
+Mast1FlagsECU2PC.ECU2PC_LocalDown := Inputs.TasteEinfahren;
+Mast1FlagsECU2PC.ECU2PC_LimitSwitch4m := FALSE;
+Mast1FlagsECU2PC.ECU2PC_LimitSwitchBottom := Inputs.EndschalterEingefahren;
+Mast1FlagsECU2PC.ECU2PC_ParkPosition := Mast1FlagsECU2PC.ECU2PC_BottomPosition;
+Mast1FlagsECU2PC.ECU2PC_MontagePos := (MastControl.status = MastControl.STATUS_MONTAGEPOSITION);
+Mast1FlagsECU2PC.ECU2PC_LimitSwitchAufgerichtet := Inputs.EndschalterAufgerichtet;
 
 
 

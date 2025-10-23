@@ -10,16 +10,6 @@ PARAMETERMANAGER
 			<entry-list>
 				<entry>
 					<values>
-						<standard key="Name">Mast1SetEncoderPW</standard>
-						<standard key="Index">16#2014</standard>
-						<standard key="SubIndex">16#1</standard>
-						<standard key="Accessright">read-write</standard>
-						<standard key="Variable" type-class="5">.Mast1SetEncoderPW</standard>
-						<standard key="Value"><![CDATA[]]></standard>
-					</values>
-				</entry>
-				<entry>
-					<values>
 						<standard key="Name">SettingsPW</standard>
 						<standard key="Index">16#2000</standard>
 						<standard key="SubIndex">16#C</standard>
@@ -90,21 +80,11 @@ PARAMETERMANAGER
 				</entry>
 				<entry>
 					<values>
-						<standard key="Name">Mast1MotorActiveTimeSeconds</standard>
-						<standard key="Index">16#2013</standard>
+						<standard key="Name">Mast1BottomLimitSwitchWindow</standard>
+						<standard key="Index">16#200F</standard>
 						<standard key="SubIndex">16#1</standard>
 						<standard key="Accessright">read-write</standard>
-						<standard key="Variable" type-class="5">.Mast1MotorActiveTimeSeconds</standard>
-						<standard key="Value"><![CDATA[]]></standard>
-					</values>
-				</entry>
-				<entry>
-					<values>
-						<standard key="Name">Mast1CurrentLimit</standard>
-						<standard key="Index">16#2018</standard>
-						<standard key="SubIndex">16#1</standard>
-						<standard key="Accessright">read-write</standard>
-						<standard key="Variable" type-class="1">.Mast1CurrentLimit</standard>
+						<standard key="Variable" type-class="3">.Mast1BottomLimitSwitchWindow</standard>
 						<standard key="Value"><![CDATA[]]></standard>
 					</values>
 				</entry>
@@ -120,11 +100,31 @@ PARAMETERMANAGER
 				</entry>
 				<entry>
 					<values>
-						<standard key="Name">Mast1BottomLimitSwitchWindow</standard>
-						<standard key="Index">16#200F</standard>
+						<standard key="Name">Mast1MotorActiveTimeSeconds</standard>
+						<standard key="Index">16#2013</standard>
 						<standard key="SubIndex">16#1</standard>
 						<standard key="Accessright">read-write</standard>
-						<standard key="Variable" type-class="3">.Mast1BottomLimitSwitchWindow</standard>
+						<standard key="Variable" type-class="5">.Mast1MotorActiveTimeSeconds</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1SetEncoderPW</standard>
+						<standard key="Index">16#2014</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="5">.Mast1SetEncoderPW</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1CurrentLimit</standard>
+						<standard key="Index">16#2018</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="1">.Mast1CurrentLimit</standard>
 						<standard key="Value"><![CDATA[]]></standard>
 					</values>
 				</entry>
@@ -145,16 +145,6 @@ PARAMETERMANAGER
 				<synchronous>true</synchronous>
 			</settings>
 			<entry-list>
-				<entry>
-					<values>
-						<standard key="Name">FlagsECU2PC</standard>
-						<standard key="Index">16#3000</standard>
-						<standard key="SubIndex">16#1</standard>
-						<standard key="Accessright"><![CDATA[read only]]></standard>
-						<standard key="Variable" type-class="3">.FlagsECU2PC</standard>
-						<standard key="Value"><![CDATA[]]></standard>
-					</values>
-				</entry>
 				<entry>
 					<values>
 						<standard key="Name">FlagsPC2ECU</standard>
@@ -202,6 +192,16 @@ PARAMETERMANAGER
 						<standard key="SubIndex">16#6</standard>
 						<standard key="Accessright"><![CDATA[read only]]></standard>
 						<standard key="Variable" type-class="3">.IntVoltage</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">FlagsECU2PC</standard>
+						<standard key="Index">16#3000</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="3">.FlagsECU2PC</standard>
 						<standard key="Value"><![CDATA[]]></standard>
 					</values>
 				</entry>
@@ -296,6 +296,16 @@ PARAMETERMANAGER
 						<standard key="SubIndex">16#1</standard>
 						<standard key="Accessright"><![CDATA[read only]]></standard>
 						<standard key="Variable" type-class="3">.Mast1FUErrorCode</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1State</standard>
+						<standard key="Index">16#3012</standard>
+						<standard key="SubIndex">16#1</standard>
+						<standard key="Accessright"><![CDATA[read only]]></standard>
+						<standard key="Variable" type-class="2">.Mast1State</standard>
 						<standard key="Value"><![CDATA[]]></standard>
 					</values>
 				</entry>

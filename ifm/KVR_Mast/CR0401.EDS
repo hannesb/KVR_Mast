@@ -5,12 +5,12 @@ Line1=Mandatory Comment.
 FileName=CR0401.EDS
 FileVersion=1
 FileRevision=1
-Description=EDS for CoDeSys-Project: D:\Projekte\Geroh\KVR_Mast\ifm\KVR_Mast\KVR_Mast.pro
-CreationTime=04:55PM
-CreationDate=10-22-2025
+Description=EDS for CoDeSys-Project: D:\Daten!\docs\Kunden\Elnic\2025\KVR_Mast\ifm\KVR_Mast\KVR_Mast.pro
+CreationTime=03:53PM
+CreationDate=10-23-2025
 CreatedBy=CoDeSys
-ModificationTime=04:55PM
-ModificationDate=10-22-2025
+ModificationTime=03:53PM
+ModificationDate=10-23-2025
 ModifiedBy=CoDeSys
 EDSVersion=4.0
 
@@ -94,7 +94,7 @@ SupportedObjects=15
 15=0x1A01
 
 [ManufacturerObjects]
-SupportedObjects=23
+SupportedObjects=24
 1=0x2000
 2=0x2006
 3=0x2007
@@ -115,9 +115,10 @@ SupportedObjects=23
 18=0x3006
 19=0x300D
 20=0x3010
-21=0x3013
-22=0x3014
-23=0x3020
+21=0x3012
+22=0x3013
+23=0x3014
+24=0x3020
 
 [1003]
 SubNumber=6
@@ -658,7 +659,7 @@ DefaultValue=0x0
 PDOMapping=0
 
 [1A01]
-SubNumber=5
+SubNumber=6
 ParameterName=Transmit PDO mapping
 ObjectType=0x8
 
@@ -667,7 +668,7 @@ ParameterName=Number of mapped objects in PDO
 ObjectType=0x7
 DataType=0x5
 AccessType=rw
-DefaultValue=3
+DefaultValue=4
 PDOMapping=0
 
 [1A01sub1]
@@ -699,7 +700,7 @@ ParameterName=PDO mapping
 ObjectType=0x7
 DataType=0x7
 AccessType=rw
-DefaultValue=0x0
+DefaultValue=0x30120108
 PDOMapping=0
 
 [1A01sub5]
@@ -1190,6 +1191,27 @@ PDOMapping=0
 ParameterName=.Mast1FUErrorCode
 ObjectType=0x7
 DataType=0x6
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[3012]
+SubNumber=2
+ParameterName=Application defined objects
+ObjectType=0x8
+
+[3012sub0]
+ParameterName=Number of entries
+ObjectType=0x7
+DataType=0x5
+AccessType=ro
+DefaultValue=0x1
+PDOMapping=0
+
+[3012sub1]
+ParameterName=.Mast1State
+ObjectType=0x7
+DataType=0x5
 AccessType=ro
 DefaultValue=0
 PDOMapping=1
