@@ -1,0 +1,17 @@
+LIBRARY
+ifm_CANopen\3S_CANopenManager.lib 27.10.21 18:23:48
+(* @LIBRARYSYMFILEINFO := '0' *)
+NumOfPOUs: 10
+CanOpenPDO_Rx: 2048
+CanOpenPDO_Tx: 2048
+CanOpenSendSDO: 2048
+CanOpenWriteMSG_FB: 2048
+IECbytecmp: 2048
+IECbytecopy: 2048
+MgrClearRxBuffer: 2048
+MgrFindNewestRecMessage: 2048
+MgrFindRecMessage: 2048
+MgrResetMessageBuffers: 2048
+NumOfGVLs: 1
+Globale_Variablen: 2048
+END_LIBRARY

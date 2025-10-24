@@ -320,7 +320,7 @@ CASE status OF
 			Status := STATUS_AUSGEFAHREN;
 		ELSE
 			(* Positionieren auf Absetzposition mit normaler Geschwindigkeit *)
-			FU1_QSData0 := Mast1VelocityNormal;
+			FU1_QSData0 := Mast1VelocityBottom;
 			FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(masthoeheAbsetzen)/FU1_POS_TO_MM);
 			FU1_QSCmd := QSCMD_ABS_POS_MODE;
 		END_IF
@@ -408,7 +408,7 @@ END_CASE
 Mast1ErrorECU2PC.ECU2PC_ErrorMastSchrittkette := (Status >= 100);
 
 (******************* FU-Fehler zurücksetzen *******************)
-IF rtTasteReset.Q (* OR errorCode71x *) OR NOT tonSystemEin.Q AND blnk.OUT THEN
+IF tasteReset (* OR errorCode71x *) OR NOT tonSystemEin.Q AND blnk.OUT THEN
 	FU1_QSCmd := QSCMD_CLEAR_ERROR;
 END_IF
 

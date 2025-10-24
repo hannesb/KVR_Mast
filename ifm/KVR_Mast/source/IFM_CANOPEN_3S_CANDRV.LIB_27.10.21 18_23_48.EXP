@@ -1,0 +1,13 @@
+LIBRARY
+ifm_CANopen\3S_CanDrv.lib 27.10.21 18:23:48
+(* @LIBRARYSYMFILEINFO := '0' *)
+NumOfPOUs: 6
+Can_GetStatus: 2048
+Can_GetVersion_23001: 2048
+Can_Init: 2048
+Can_Read: 2048
+Can_SetFilter: 2048
+Can_Write: 2048
+NumOfGVLs: 1
+Globale_Variablen: 2048
+END_LIBRARY
