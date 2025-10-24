@@ -31,8 +31,6 @@ VAR CONSTANT
 	STATUS_WAIT_FOR_CAN_CLIENTS: 	BYTE := 10;
 	STATUS_SETUP_OFFSET: 			BYTE := 11;
 	STATUS_WRITE_OFFSET: 			BYTE := 12;
-	(* STATUS_SETUP_SAVE: 			   BYTE := 13; *)
-	(* STATUS_WRITE_SAVE: 			   BYTE := 14; *)
 	STATUS_SUCCESS: 				BYTE := 15;
 	STATUS_NULLFAHRT_AUSFAHREN: 	BYTE := 20;
 	STATUS_NULLFAHRT_EINFAHREN: 	BYTE := 21;
@@ -51,20 +49,32 @@ VAR CONSTANT
 	STATUS_SCHLEICHFAHRT: 			BYTE := 72;
 	STATUS_EINGEFAHREN: 			BYTE := 73;
 
-	STATUS_ERR_FU_TIMEOUT: 			BYTE := 100;
-	STATUS_ERR_SET_FU_POS: 			BYTE := 101;
-	STATUS_ERR_CURRENT_BOTTOM: 		BYTE := 102;
-	STATUS_ERR_CURRENT: 			BYTE := 103;
-	STATUS_ERR_CAN_TIMEOUT: 		BYTE := 104;
-	STATUS_ERR_FU: 					BYTE := 105;
-	STATUS_ERR_ES_UNTEN_AUSFAHREN1:	BYTE := 106;
-	STATUS_ERR_ES_UNTEN_AUSFAHREN2:	BYTE := 107;
-	STATUS_ERR_ES_FREIG_AUSFAHREN1:	BYTE := 108;
-	STATUS_ERR_ES_UNTEN_EINFAHREN1:	BYTE := 109;
-	STATUS_ERR_ES_UNTEN_ABSETZEN:	BYTE := 110;
-	STATUS_ERR_ES_UNTEN_EINFAHREN2:	BYTE := 111;
-	STATUS_ERR_ES_UNTEN_EINFAHREN3:	BYTE := 112;
-	STATUS_ERR_NOTANTRIEB:			BYTE := 113;
+	(* Ständige Überprüfungen *)
+	STATUS_ERR_FU_TIMEOUT: 			BYTE := 100; (* FU nicht (mehr) online *)
+	STATUS_ERR_CURRENT: 			BYTE := 101; (* Hoher Grenzwert Strom überschritten *)
+	STATUS_ERR_FU: 					BYTE := 102; (* FU meldet Fehler *)
+	STATUS_ERR_NOTANTRIEB:			BYTE := 103; (* Endschalter Notantrieb betätigt *)
+
+	(* Fehlerzustände in Schrittkette *)
+	(* Definitionen: *)
+	(* Position U: Parameter Masthöhe untere Position *)
+	(* Position E: Parameter Masthöhe untere Position + Parameter Fenster unterer Endschalter *)
+	(* Position S: Parameter Masthöhe untere Position + Parameter Offset untere Position *)
+	(* Position A: Parameter Masthöhe obere Position - Parameter Mast oben Absetzen Offset *)
+	(* Position O: Parameter Masthöhe obere Position *)
+	(* Es muss gelten: Position U < Position E < Position S < Position A < Position O *)
+	STATUS_ERR_SET_FU_POS: 			BYTE := 110; (* Fehler beim Setzen der Nullposition im FU, FU-Position springt nicht auf eingestellten Wert *)
+	STATUS_ERR_CURRENT_BOTTOM: 		BYTE := 111; (* Bei langsamer Fahrt niedriger Grenzwert Strom überschritten *)
+
+	STATUS_ERR_ES_UNTEN_AUSFAHREN1:	BYTE := 120; (* Beim Ausfahren Endschalter suchen: Endschalter UNTEN unterhalb Position S nicht gefunden *)
+	STATUS_ERR_ES_UNTEN_AUSFAHREN2:	BYTE := 121; (* Beim Ausfahren: Endschalter UNTEN oberhalb Position E betätigt *)
+	STATUS_ERR_ES_FREIG_AUSFAHREN1:	BYTE := 123; (* Beim Ausfahren auf Position O: Endschalter AUFGERICHTET nicht mehr betätigt *)
+
+	STATUS_ERR_ES_UNTEN_ABSETZEN:	BYTE := 130; (* Beim Einfahren in Position A: Endschalter UNTEN betätigt *)
+
+	STATUS_ERR_ES_UNTEN_EINFAHREN1:	BYTE := 140; (* Beim Einfahren auf Position S: Endschalter UNTEN betätigt *)
+	STATUS_ERR_ES_UNTEN_EINFAHREN2:	BYTE := 141; (* Bei Schleichfahrt auf Position U: Endschalter UNTEN nicht gefunden *)
+	STATUS_ERR_ES_UNTEN_EINFAHREN3:	BYTE := 142; (* Bei Schleichfahrt auf Position U: Endschalter UNTEN unterhalb Position E nicht mehr betätigt *)
 
 END_VAR
 
@@ -114,7 +124,7 @@ END_IF
 (******************* Fehlermeldungen *******************)
 IF NOT canNodeFU1Present AND NOT tofInit.Q AND NOT SIMULATIONSMODUS THEN
 	Mast1ErrorECU2PC.ECU2PC_ErrorCanTimeout := TRUE;
-	Status := STATUS_ERR_CAN_TIMEOUT;
+	Status := STATUS_ERR_FU_TIMEOUT;
 END_IF
 
 (* Auswertung FU Fehlercode *)
@@ -280,7 +290,7 @@ CASE status OF
 			(* Taste nicht mehr gedrückt? *)
 			Status := STATUS_IDLE;
 		ELSIF status = STATUS_AUSFAHREN_ES_SUCHEN AND Mast1Height >= masthoeheSchleichfahrt THEN
-			(* Endschalter unten AUS unterhalb Position Schleichfahrt *)
+			(* Endschalter unten AUS oberhalb Position Schleichfahrt *)
 			Status := STATUS_ERR_ES_UNTEN_AUSFAHREN1;
 		ELSIF status = STATUS_AUSFAHREN_ES_SUCHEN AND NOT inputs.EndschalterEingefahren THEN
 			(* Endschalter unten erreicht -> Nullpunkt setzen *)
@@ -358,7 +368,7 @@ CASE status OF
 			Status := STATUS_IDLE;
 		ELSIF inputs.EndschalterEingefahren THEN
 			(* Endschalter unten EIN oberhalb Position Schleichfahrt *)
-			Status := STATUS_ERR_ES_UNTEN_AUSFAHREN2;
+			Status := STATUS_ERR_ES_UNTEN_EINFAHREN1;
 		ELSIF Mast1Height <= masthoeheSchleichfahrt THEN
 			(* Position Schleichfahrt erreicht *)
 			Status := STATUS_IDLE;
