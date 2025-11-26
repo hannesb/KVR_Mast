@@ -17,13 +17,18 @@ VAR
 	TSStart: DWORD;
 	rtTasteReset: R_TRIG;
 	rtSystemEin: R_TRIG;
+	ftEndschalterEingefahren: F_TRIG;
 	tonSystemEin: TON;
 	tonKompressor: TON;
 	tofInit: TOF;
+	tonVelocityMode: TON;
 	blnk: BLINK;
 	SDOData: ARRAY[0..3] OF BYTE;
 	SDOWriteOffset: CANOPEN_SDOWRITE;
 	errorCode71x: BOOL;
+	targetVelocity: INT;
+	currentVelocity: INT;
+	idxHist: WORD := 0;
 END_VAR
 VAR CONSTANT
 	_100ms: DWORD := 100000;
@@ -34,6 +39,7 @@ VAR CONSTANT
 	STATUS_SUCCESS: 				BYTE := 15;
 	STATUS_NULLFAHRT_AUSFAHREN: 	BYTE := 20;
 	STATUS_NULLFAHRT_EINFAHREN: 	BYTE := 21;
+	STATUS_NULLFAHRT_EINGEFAHREN:	BYTE := 22;
 	STATUS_NULLPUNKT_SETZEN_INIT: 	BYTE := 30;
 	STATUS_NULLPUNKT_SETZEN: 		BYTE := 31;
 	STATUS_IDLE: 					BYTE := 50;
@@ -45,7 +51,6 @@ VAR CONSTANT
 	STATUS_AUSFAHREN_MONTAGE: 		BYTE := 66;
 	STATUS_MONTAGEPOSITION: 		BYTE := 67;
 	STATUS_EINFAHREN: 				BYTE := 70;
-	STATUS_SCHLEICHFAHRT_ES_SUCHEN: BYTE := 71;
 	STATUS_SCHLEICHFAHRT: 			BYTE := 72;
 	STATUS_EINGEFAHREN: 			BYTE := 73;
 
@@ -81,11 +86,12 @@ END_VAR
 (* @END_DECLARATION := '0' *)
 
 
-(******************* Diverse Timer *******************)
+(******************* Diverse Timer und Flankenauswertungen *******************)
 tonSystemEin(IN := TRUE, PT := T#1000ms);
 tofInit(IN := init, PT := T#3s);
 rtSystemEin(CLK := NOT tofInit.Q);
 blnk(ENABLE := TRUE, TIMELOW := T#200ms, TIMEHIGH := T#200ms);
+ftEndschalterEingefahren(CLK := inputs.EndschalterEingefahren);
 
 (******************* Initialisierungen *******************)
 outputs.RelaisMotorLeistung := FALSE;
@@ -142,7 +148,7 @@ IF canNodeFU1Present AND tonSystemEin.Q AND FU1_ErrorCode <> 0 THEN
 END_IF
 
 (******************* Fehler *******************)
-IF ABS(Mast1Current) > Mast1CurrentLimit THEN
+IF ABS(Mast1Current) > Mast1CurrentLimit AND Status <> STATUS_SCHLEICHFAHRT THEN
 	Status := STATUS_ERR_CURRENT;
 END_IF
 
@@ -169,54 +175,69 @@ CASE status OF
 		END_IF
 
 	STATUS_SUCCESS:
-		(* Falls Endschalter EIN und Position plausibel -> normal Starten *)
-		(* Sonst Nullfahrt nach oben bzw. unten *)
-		IF inputs.EndschalterEingefahren AND ABS_DIFF(Mast1Height, Mast1BottomPosition) <= 2 THEN
-			Status := STATUS_EINGEFAHREN;
-		ELSIF inputs.EndschalterEingefahren THEN
-			Status := STATUS_NULLFAHRT_AUSFAHREN;
-		ELSE
-			Status := STATUS_NULLFAHRT_EINFAHREN;
+		(* Erst mal 1s warten nachdem FU online ist *)
+		IF PLC_CYCLE.cycle - TSStart > 10*_100ms THEN
+			(* Falls Endschalter EIN und Position plausibel -> normal Starten mit Anzeige 'Eingefahren' *)
+			IF inputs.EndschalterEingefahren AND ABS_DIFF(Mast1Height, Mast1BottomPosition) <= 2 THEN
+				Status := STATUS_EINGEFAHREN;
+			ELSIF ABS_DIFF(Mast1Height, Mast1HeightRetain) <= 5 THEN
+				(* Falls geringe (5mm) Abweichung zwischen gemerkter und aktueller Position -> normal Starten *)
+				Status := STATUS_IDLE;
+			ELSE
+				(* Sonst Nullfahrt nach oben bzw. unten *)
+				IF inputs.EndschalterEingefahren THEN
+					Status := STATUS_NULLFAHRT_AUSFAHREN;
+				ELSE
+					Status := STATUS_NULLFAHRT_EINFAHREN;
+				END_IF
+			END_IF
 		END_IF
 
 	STATUS_NULLFAHRT_AUSFAHREN:
-		IF ABS(Mast1Current) > Mast1CurrentLimitBottom THEN
-			(* Stromüberwachung unten *)
-			Status := STATUS_ERR_CURRENT_BOTTOM;
+		IF tasteAb THEN
+ 			Status := STATUS_NULLFAHRT_EINFAHREN;
 		ELSIF tasteAuf THEN
-			IF NOT inputs.EndschalterEingefahren THEN
-				(* Endschalter unten erreicht, Nullpunkt setzen *)
+			IF ftEndschalterEingefahren.Q THEN
+				(* Fallende Flanke Endschalter unten, Nullpunkt setzen *)
 				Status := STATUS_NULLPUNKT_SETZEN_INIT;
 			ELSE
 				(* Ausfahren im Geschwindigkeitsmodus *)
 				(* Velocity mode: pos = auffahren, neg = einfahren oder umgekehrt je nach Vorzeichen Umrechnungsfaktor *)
 				IF FU1_POS_TO_MM > 0 THEN
-					FU1_QSData0 := Mast1VelocityBottom;
+					targetVelocity := Mast1VelocityBottom;
 				ELSE
-					FU1_QSData0 := -Mast1VelocityBottom;
+					targetVelocity := -Mast1VelocityBottom;
 				END_IF
 				FU1_QSCmd := QSCMD_VELOCITY_MODE;
 			END_IF
 		END_IF
 
 	STATUS_NULLFAHRT_EINFAHREN:
-		IF ABS(Mast1Current) > Mast1CurrentLimitBottom THEN
-			(* Stromüberwachung unten *)
+		IF tasteAuf THEN
+ 			Status := STATUS_NULLFAHRT_AUSFAHREN;
+		ELSIF tonVelocityMode.Q AND NOT inputs.EndschalterEingefahren AND ABS(Mast1Current) > Mast1CurrentLimitBottom THEN
+			(* Stromgrenzwert darf erst erreicht werden wenn unterer Endschalter betätigt, einschaltverzögert *)
 			Status := STATUS_ERR_CURRENT_BOTTOM;
 		ELSIF tasteAb THEN
-			IF inputs.EndschalterEingefahren THEN
-				(* Endschalter unten erreicht, Nullpunkt setzen *)
-				Status := STATUS_NULLPUNKT_SETZEN_INIT;
+			IF ABS(Mast1Current) > Mast1CurrentLimitBottom THEN
+				(* Stromgrenzwert erreicht *)
+				Status := STATUS_NULLFAHRT_EINGEFAHREN;
 			ELSE
 				(* Einfahren im Geschwindigkeitsmodus *)
 				(* Velocity mode: pos = auffahren, neg = einfahren oder umgekehrt je nach Vorzeichen Umrechnungsfaktor *)
 				IF FU1_POS_TO_MM > 0 THEN
-					FU1_QSData0 := -Mast1VelocityBottom;
+					targetVelocity := -Mast1VelocityBottom;
 				ELSE
-					FU1_QSData0 := Mast1VelocityBottom;
+					targetVelocity := Mast1VelocityBottom;
 				END_IF
 				FU1_QSCmd := QSCMD_VELOCITY_MODE;
 			END_IF
+		END_IF
+
+	STATUS_NULLFAHRT_EINGEFAHREN:
+		FU1_QSCmd := QSCMD_QUICK_STOP;
+		IF tasteAuf THEN
+			Status := STATUS_NULLFAHRT_AUSFAHREN;
 		END_IF
 
 	STATUS_NULLPUNKT_SETZEN_INIT:
@@ -278,8 +299,6 @@ CASE status OF
 		ELSIF tasteAb THEN
 			IF Mast1Height > masthoeheSchleichfahrt THEN
 				Status := STATUS_EINFAHREN;
-			ELSIF NOT inputs.EndschalterEingefahren THEN
-				Status := STATUS_SCHLEICHFAHRT_ES_SUCHEN;
 			ELSE
 				Status := STATUS_SCHLEICHFAHRT;
 			END_IF
@@ -307,7 +326,11 @@ CASE status OF
 		ELSE
 			(* Bei Suche ES langsam fahren, sonst normale Geschwindigkeit *)
 			IF status = STATUS_AUSFAHREN THEN
-				FU1_QSData0 := Mast1VelocityNormal;
+				IF Mast1FlagsPC2ECU.PC2ECU_SlowSpeed THEN
+					FU1_QSData0 := Mast1VelocitySlow;
+				ELSE
+					FU1_QSData0 := Mast1VelocityNormal;
+				END_IF
 			ELSE
 				FU1_QSData0 := Mast1VelocityBottom;
 			END_IF
@@ -329,7 +352,7 @@ CASE status OF
 			(* Absetzposition erreicht *)
 			Status := STATUS_AUSGEFAHREN;
 		ELSE
-			(* Positionieren auf Absetzposition mit normaler Geschwindigkeit *)
+			(* Positionieren auf Absetzposition mit Geschwindigkeit Schleichfahrt *)
 			FU1_QSData0 := Mast1VelocityBottom;
 			FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(masthoeheAbsetzen)/FU1_POS_TO_MM);
 			FU1_QSCmd := QSCMD_ABS_POS_MODE;
@@ -352,13 +375,19 @@ CASE status OF
 			Status := STATUS_MONTAGEPOSITION;
 		ELSE
 			(* Positionieren auf Montageposition mit normaler Geschwindigkeit *)
-			FU1_QSData0 := Mast1VelocityNormal;
+			IF Mast1FlagsPC2ECU.PC2ECU_SlowSpeed THEN
+				FU1_QSData0 := Mast1VelocitySlow;
+			ELSE
+				FU1_QSData0 := Mast1VelocityNormal;
+			END_IF
 			FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(Mast1MontagePos)/FU1_POS_TO_MM);
 			FU1_QSCmd := QSCMD_ABS_POS_MODE;
 		END_IF
 
 	STATUS_MONTAGEPOSITION:
 		IF tasteAb THEN
+			Status := STATUS_IDLE;
+		ELSIF tasteAuf AND inputs.EndschalterAufgerichtet THEN
 			Status := STATUS_IDLE;
 		END_IF
 
@@ -372,38 +401,46 @@ CASE status OF
 		ELSIF Mast1Height <= masthoeheSchleichfahrt THEN
 			(* Position Schleichfahrt erreicht *)
 			Status := STATUS_IDLE;
+		ELSIF inputs.EndschalterAufgerichtet THEN
+			(* Positionieren auf Position Schleichfahrt mit normaler Geschwindigkeit *)
+			IF Mast1FlagsPC2ECU.PC2ECU_SlowSpeed THEN
+				FU1_QSData0 := Mast1VelocitySlow;
+			ELSE
+				FU1_QSData0 := Mast1VelocityNormal;
+			END_IF
+(*			FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(masthoeheSchleichfahrt)/FU1_POS_TO_MM);*)
+			FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(Mast1MontagePos)/FU1_POS_TO_MM);
+
+			FU1_QSCmd := QSCMD_ABS_POS_MODE;
 		ELSE
 			(* Positionieren auf Position Schleichfahrt mit normaler Geschwindigkeit *)
-			FU1_QSData0 := Mast1VelocityNormal;
+			IF Mast1FlagsPC2ECU.PC2ECU_SlowSpeed THEN
+				FU1_QSData0 := Mast1VelocitySlow;
+			ELSE
+				FU1_QSData0 := Mast1VelocityNormal;
+			END_IF
 			FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(masthoeheSchleichfahrt)/FU1_POS_TO_MM);
-			FU1_QSCmd := QSCMD_ABS_POS_MODE;
-		END_IF
 
-	STATUS_SCHLEICHFAHRT_ES_SUCHEN, STATUS_SCHLEICHFAHRT:
-		IF ABS(Mast1Current) > Mast1CurrentLimitBottom THEN
-			(* Stromüberwachung unten *)
-			Status := STATUS_ERR_CURRENT_BOTTOM;
-		ELSIF NOT tasteAb THEN
+			FU1_QSCmd := QSCMD_ABS_POS_MODE;
+			END_IF
+
+	STATUS_SCHLEICHFAHRT:
+		IF NOT tasteAb THEN
 			(* Taste nicht mehr gedrückt? *)
 			Status := STATUS_IDLE;
-		ELSIF Mast1Height <= Mast1BottomPosition THEN
+(*		ELSIF ABS(Mast1Current) > Mast1CurrentLimitBottom THEN *)
+	    ELSIF Mast1Height <= Mast1BottomPosition THEN
 			(* Untere Position erreicht *)
-			IF status = STATUS_SCHLEICHFAHRT THEN
+			IF inputs.EndschalterEingefahren THEN
 				Status := STATUS_EINGEFAHREN;
 			ELSE
 				(* Endschalter unten nicht erreicht *)
 				Status := STATUS_ERR_ES_UNTEN_EINFAHREN2;
 			END_IF
-		ELSIF status = STATUS_SCHLEICHFAHRT_ES_SUCHEN AND inputs.EndschalterEingefahren THEN
-			(* Endschalter unten erreicht, Nullpunkt setzen *)
-			Status := STATUS_NULLPUNKT_SETZEN_INIT;
-		ELSIF status = STATUS_SCHLEICHFAHRT AND NOT inputs.EndschalterEingefahren THEN
-			(* Endschalter unten AUS nach Suche ES *)
-			Status := STATUS_ERR_ES_UNTEN_EINFAHREN3;
 		ELSE
 			(* Positionieren auf untere Position mit langsamer Geschwindigkeit *)
 			FU1_QSData0 := Mast1VelocityBottom;
-			FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(Mast1BottomPosition)/FU1_POS_TO_MM);
+			FU1_QSData1 := REAL_TO_DINT(WORD_TO_REAL(Mast1BottomPosition-40)/FU1_POS_TO_MM);
 			FU1_QSCmd := QSCMD_ABS_POS_MODE;
 		END_IF
 
@@ -413,6 +450,11 @@ CASE status OF
 		END_IF
 
 END_CASE
+
+(***** Aktuelle Masthöhe speichern falls Mast nicht in Initialisierungsphase/Nullfahrt *****)
+IF Status >= STATUS_IDLE AND Mast1Height >= Mast1BottomPosition - 40 AND Mast1Height <= Mast1TopPosition + 10 THEN
+	Mast1HeightRetain := Mast1Height;
+END_IF
 
 (******************* Schrittkette in Fehlerzustand *******************)
 Mast1ErrorECU2PC.ECU2PC_ErrorMastSchrittkette := (Status >= 100);
@@ -425,6 +467,40 @@ END_IF
 (******************* K1 Versorgung Motor *******************)
 IF NOT inputs.EndschalterNotantrieb THEN
 	outputs.RelaisMotorLeistung := TRUE;
+END_IF
+
+(******************* Rampe Geschwindigkeitsmodus *******************)
+(* Nur beim Beschleunigen, beim Abbremsen soll sofort abgeschaltet werden *)
+IF FU1_QSCmd = QSCMD_VELOCITY_MODE THEN
+	IF targetVelocity > 0 THEN
+		(* Positive Sollgeschwindigkeit: *)
+		(* In jedem Zyklus 10 hochzählen bis Sollgeschwindigkeit erreicht *)
+		(* D.h. bei 10ms Zykluszeit sind 500 U/min in 500ms erreicht*)
+		currentVelocity := MIN(currentVelocity + 1, targetVelocity);
+	ELSE
+		(* Negative Sollgeschwindigkeit: *)
+		(* In jedem Zyklus 10 runterzählen bis Sollgeschwindigkeit erreicht *)
+		(* D.h. bei 10ms Zykluszeit sind 500 U/min in 500ms erreicht*)
+		currentVelocity := MAX(currentVelocity - 1, targetVelocity);
+	END_IF
+	(* Geschwindigkeit setzen *)
+	FU1_QSData0 := currentVelocity;
+ELSE
+	(* Auf 0 setzen falls kein Geschwindigkeitsmodus *)
+	currentVelocity := 0;
+END_IF
+
+(******************* Einschaltverzögerung Geschwindigkeitsmodus *******************)
+tonVelocityMode(IN := (FU1_QSCmd = QSCMD_VELOCITY_MODE), PT := T#1ms);
+
+(******************* Nach Start im Geschwindigkeitsmodus die ersten 100 Stromwerte in Array schreiben *******************)
+IF FU1_QSCmd = QSCMD_VELOCITY_MODE THEN
+	IF idxHist <= MAX_CURRENT_HIST THEN
+		FU1_Current_Hist[idxHist] := Mast1Current;
+		idxHist := idxHist + 1;
+	END_IF
+ELSE
+	idxHist := 0;
 END_IF
 
 (******************* SDO-Befehle *******************)

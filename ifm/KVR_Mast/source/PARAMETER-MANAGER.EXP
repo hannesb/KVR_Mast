@@ -138,6 +138,16 @@ PARAMETERMANAGER
 						<standard key="Value"><![CDATA[]]></standard>
 					</values>
 				</entry>
+				<entry>
+					<values>
+						<standard key="Name">Mast1VelocitySlow</standard>
+						<standard key="Index">16#200B</standard>
+						<standard key="SubIndex">1</standard>
+						<standard key="Accessright">read-write</standard>
+						<standard key="Variable" type-class="1">.Mast1VelocitySlow</standard>
+						<standard key="Value"><![CDATA[]]></standard>
+					</values>
+				</entry>
 			</entry-list>
 		</parameterlist>
 		<parameterlist type="variables" name="proc_vars_ecu">

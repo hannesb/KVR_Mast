@@ -36,8 +36,4 @@ tasteReset := (tasteAuf AND tasteAb);
 TOFReset(IN := tasteReset, PT := T#500ms);
 tasteAuf := NOT TOFReset.Q AND (inputs.TasteAusfahren OR Mast1FlagsPC2ECU.PC2ECU_MoveUp);
 tasteAb := NOT TOFReset.Q AND (inputs.TasteEinfahren OR Mast1FlagsPC2ECU.PC2ECU_MoveDown);
-
-
-
-
 END_PROGRAM

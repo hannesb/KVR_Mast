@@ -49,8 +49,13 @@ VAR_GLOBAL
 
 	FU1_Current_Sim: DINT;
 
+	FU1_Current_Hist: ARRAY[0..MAX_CURRENT_HIST] OF DINT;
+
 END_VAR
 
+VAR_GLOBAL RETAIN
+	Mast1HeightRetain: WORD;
+END_VAR
 (* @OBJECT_END := 'Global_Variables' *)
 (* @CONNECTIONS := Global_Variables
 FILENAME : ''
