@@ -5,18 +5,18 @@ Line1=Mandatory Comment.
 FileName=CR0401.EDS
 FileVersion=1
 FileRevision=1
-Description=EDS for CoDeSys-Project: D:\Daten!\docs\Kunden\Elnic\2025\KVR_Mast\ifm\KVR_Mast\KVR_Mast.1.0.pro
-CreationTime=12:45AM
-CreationDate=10-24-2025
+Description=EDS for CoDeSys-Project: D:\Daten!\docs\Kunden\Elnic\2025\KVR_Mast\ifm\KVR_Mast\KVR_Mast.1.2.pro
+CreationTime=02:01PM
+CreationDate=11-26-2025
 CreatedBy=CoDeSys
-ModificationTime=12:45AM
-ModificationDate=10-24-2025
+ModificationTime=02:01PM
+ModificationDate=11-26-2025
 ModifiedBy=CoDeSys
 EDSVersion=4.0
 
 [DeviceInfo]
 VendorName=3S Smart Software Solutions GmbH
-ProductName=KVR_Mast.1.0
+ProductName=KVR_Mast.1.2
 ProductNumber=0x33535F44
 ProductVersion=1
 ProductRevision=1
@@ -94,31 +94,32 @@ SupportedObjects=15
 15=0x1A01
 
 [ManufacturerObjects]
-SupportedObjects=24
+SupportedObjects=25
 1=0x2000
 2=0x2006
 3=0x2007
 4=0x200A
-5=0x200C
-6=0x200D
-7=0x200E
-8=0x200F
-9=0x2010
-10=0x2013
-11=0x2014
-12=0x2018
-13=0x2019
-14=0x3000
-15=0x3001
-16=0x3003
-17=0x3004
-18=0x3006
-19=0x300D
-20=0x3010
-21=0x3012
-22=0x3013
-23=0x3014
-24=0x3020
+5=0x200B
+6=0x200C
+7=0x200D
+8=0x200E
+9=0x200F
+10=0x2010
+11=0x2013
+12=0x2014
+13=0x2018
+14=0x2019
+15=0x3000
+16=0x3001
+17=0x3003
+18=0x3004
+19=0x3006
+20=0x300D
+21=0x3010
+22=0x3012
+23=0x3013
+24=0x3014
+25=0x3020
 
 [1003]
 SubNumber=6
@@ -774,7 +775,7 @@ ParameterName=.Mast1TopPosition
 ObjectType=0x7
 DataType=0x6
 AccessType=rw
-DefaultValue=2500
+DefaultValue=12000
 PDOMapping=0
 
 [2007]
@@ -795,7 +796,7 @@ ParameterName=.Mast1BottomPosition
 ObjectType=0x7
 DataType=0x6
 AccessType=rw
-DefaultValue=1675
+DefaultValue=2975
 PDOMapping=0
 
 [200A]
@@ -817,6 +818,27 @@ ObjectType=0x7
 DataType=0x3
 AccessType=rw
 DefaultValue=2500
+PDOMapping=0
+
+[200B]
+SubNumber=2
+ParameterName=Application defined objects
+ObjectType=0x8
+
+[200Bsub0]
+ParameterName=Number of entries
+ObjectType=0x7
+DataType=0x5
+AccessType=ro
+DefaultValue=0x1
+PDOMapping=0
+
+[200Bsub1]
+ParameterName=.Mast1VelocitySlow
+ObjectType=0x7
+DataType=0x3
+AccessType=rw
+DefaultValue=500
 PDOMapping=0
 
 [200C]
@@ -858,7 +880,7 @@ ParameterName=.Mast1BottomPositionOffset
 ObjectType=0x7
 DataType=0x6
 AccessType=rw
-DefaultValue=130
+DefaultValue=150
 PDOMapping=0
 
 [200E]
@@ -879,7 +901,7 @@ ParameterName=.Mast1CurrentLimitBottom
 ObjectType=0x7
 DataType=0x3
 AccessType=rw
-DefaultValue=30
+DefaultValue=15
 PDOMapping=0
 
 [200F]
@@ -900,7 +922,7 @@ ParameterName=.Mast1BottomLimitSwitchWindow
 ObjectType=0x7
 DataType=0x6
 AccessType=rw
-DefaultValue=100
+DefaultValue=130
 PDOMapping=0
 
 [2010]
@@ -921,7 +943,7 @@ ParameterName=.Mast1MontagePos
 ObjectType=0x7
 DataType=0x6
 AccessType=rw
-DefaultValue=2000
+DefaultValue=3975
 PDOMapping=0
 
 [2013]
@@ -984,7 +1006,7 @@ ParameterName=.Mast1CurrentLimit
 ObjectType=0x7
 DataType=0x3
 AccessType=rw
-DefaultValue=40
+DefaultValue=50
 PDOMapping=0
 
 [2019]

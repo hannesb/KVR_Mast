@@ -55,6 +55,7 @@ END_VAR
 
 VAR_GLOBAL RETAIN
 	Mast1HeightRetain: WORD;
+    NullfahrtErforderlich: BOOL;
 END_VAR
 (* @OBJECT_END := 'Global_Variables' *)
 (* @CONNECTIONS := Global_Variables

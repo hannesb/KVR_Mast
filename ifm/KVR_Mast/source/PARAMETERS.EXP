@@ -11,9 +11,9 @@ VAR_GLOBAL RETAIN
 	Mast1VelocityNormal: INT := 2500			{parameter list=Parameters [name=Mast1VelocityNormal			index=16#200A subindex=1 accessright="read-write"] };
 	Mast1VelocitySlow: INT := 500				{parameter list=Parameters [name=Mast1VelocitySlow				index=16#200B subindex=1 accessright="read-write"] };
 	Mast1VelocityBottom: INT := 500				{parameter list=Parameters [name=Mast1VelocityBottom			index=16#200C subindex=1 accessright="read-write"] };
-	Mast1BottomPositionOffset: WORD := 150		{parameter list=Parameters [name=Mast1BottomPositionOffset		index=16#200D subindex=1 accessright="read-write"] };
-	Mast1CurrentLimitBottom: INT := 15			{parameter list=Parameters [name=Mast1CurrentLimitBottom		index=16#200E subindex=1 accessright="read-write"] };
-	Mast1BottomLimitSwitchWindow: WORD := 130	{parameter list=Parameters [name=Mast1BottomLimitSwitchWindow	index=16#200F subindex=1 accessright="read-write"] };
+	Mast1BottomPositionOffset: WORD := 60		{parameter list=Parameters [name=Mast1BottomPositionOffset		index=16#200D subindex=1 accessright="read-write"] };
+	Mast1CurrentLimitBottom: INT := 30			{parameter list=Parameters [name=Mast1CurrentLimitBottom		index=16#200E subindex=1 accessright="read-write"] };
+	Mast1BottomLimitSwitchWindow: WORD := 50	{parameter list=Parameters [name=Mast1BottomLimitSwitchWindow	index=16#200F subindex=1 accessright="read-write"] };
 	Mast1MontagePos: WORD := 3975 				{parameter list=Parameters [name=Mast1MontagePos 				index=16#2010 subindex=1 accessright="read-write"] };
 	Mast1MotorActiveTimeSeconds: DWORD := 0		{parameter list=Parameters [name=Mast1MotorActiveTimeSeconds	index=16#2013 subindex=1 accessright="read-write"] };
 	Mast1CurrentLimit: INT := 50				{parameter list=Parameters [name=Mast1CurrentLimit				index=16#2018 subindex=1 accessright="read-write"] };
