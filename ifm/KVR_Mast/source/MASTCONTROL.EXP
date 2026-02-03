@@ -29,6 +29,7 @@ VAR
 	targetVelocity: INT;
 	currentVelocity: INT;
 	idxHist: WORD := 0;
+	FU1_ErrorCode_Old: INT;
 END_VAR
 VAR CONSTANT
 	_100ms: DWORD := 100000;
@@ -138,6 +139,11 @@ END_IF
 (* -710 -> Position unbekannt *)
 (* -711 -> Positionswert ungültig *)
 
+IF FU1_ErrorCode <> FU1_ErrorCode_Old AND FU1_ErrorCode_Idx <= MAX_ERRORCODE_HIST THEN
+	FU1_ErrorCode_Hist[FU1_ErrorCode_Idx] := FU1_ErrorCode;
+	FU1_ErrorCode_Idx := FU1_ErrorCode_Idx + 1;
+END_IF
+
 errorCode71x := FU1_ErrorCode = -710 OR FU1_ErrorCode = -711;
 
 IF canNodeFU1Present AND tonSystemEin.Q AND FU1_ErrorCode <> 0 THEN
@@ -184,8 +190,10 @@ CASE status OF
             IF inputs.EndschalterEingefahren AND ABS_DIFF(Mast1Height, Mast1BottomPosition) <= 2 THEN
                 Status := STATUS_EINGEFAHREN;
                 NullfahrtErforderlich := FALSE;
-            ELSIF ABS_DIFF(Mast1Height, Mast1HeightRetain) <= 5 AND NOT NullfahrtErforderlich THEN
-                (* Falls geringe (5mm) Abweichung zwischen gemerkter und aktueller Position -> normal Starten *)
+            ELSIF ABS_DIFF(Mast1Height, Mast1HeightRetain) <= 5 AND NOT NullfahrtErforderlich AND NOT inputs.EndschalterEingefahren THEN
+                (* Falls geringe (5mm) Abweichung zwischen gemerkter und aktueller Position *)
+				(* und nicht auf unterem Endschalter (bei unterem Endschalter immer Nullfahrt *)
+				(* -> normal Starten *)
                 Status := STATUS_IDLE;
             ELSE
                 (* Sonst Nullfahrt nach oben bzw. unten *)
@@ -295,14 +303,14 @@ CASE status OF
 
 	STATUS_IDLE:
 		(* Startpunkt für Mast auf/ab fahren *)
-		        IF tasteAuf THEN
+		IF tasteAuf THEN
             IF inputs.EndschalterEingefahren THEN
                 Status := STATUS_AUSFAHREN_ES_SUCHEN;
-            ELSIF inputs.EndschalterAufgerichtet THEN
-                Status := STATUS_AUSFAHREN;
-            ELSE
-                Status := STATUS_AUSFAHREN_MONTAGE;
-            END_IF
+			ELSIF inputs.EndschalterAufgerichtet THEN
+	            Status := STATUS_AUSFAHREN;
+	        ELSE
+	            Status := STATUS_AUSFAHREN_MONTAGE;
+			END_IF
         ELSIF tasteAb THEN
             IF NOT inputs.EndschalterAufgerichtet AND Mast1Height > masthoeheSchleichfahrt
                     OR inputs.EndschalterAufgerichtet AND Mast1Height > Mast1MontagePos THEN

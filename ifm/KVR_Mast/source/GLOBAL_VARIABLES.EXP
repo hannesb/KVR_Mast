@@ -50,6 +50,8 @@ VAR_GLOBAL
 	FU1_Current_Sim: DINT;
 
 	FU1_Current_Hist: ARRAY[0..MAX_CURRENT_HIST] OF DINT;
+	FU1_ErrorCode_Idx: BYTE;
+	FU1_ErrorCode_Hist: ARRAY[0..MAX_ERRORCODE_HIST] OF INT;
 
 END_VAR
 
